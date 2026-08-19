@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上传户型图 - 运乘风水 | 户型居住环境分析</title>
+<meta name="description" content="上传户型图并补充入户门方位等基本信息，获取八宅户型居住环境分析报告。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23241d10'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23e6c886' font-family='serif'>运</text></svg>">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="brand-seal">运</span>
+      <span><span class="brand-name">运乘风水</span><br><span class="brand-sub">YUNCHENG · 户型居住环境分析</span></span>
+    </a>
+    <nav class="nav">
+      <a href="index.html#why">为什么</a>
+      <a href="index.html#flow">服务流程</a>
+      <a href="index.html#price">价格</a>
+      <a href="index.html#faq">常见问题</a>
+      <a class="btn btn-gold btn-sm" href="upload.html">上传户型图</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="wrap page-head">
+  <div class="eyebrow">STEP 02 · 上传</div>
+  <h1>上传户型图，补充基本信息</h1>
+  <p class="sub">只需户型图和入户门方位即可出报告；其余信息选填，用于提高结论贴合度。</p>
+  <div class="flowbar">
+    <span class="fb done">壹 · 微信登录</span>
+    <span class="fb on">贰 · 上传户型</span>
+    <span class="fb">叁 · 支付 9.9</span>
+    <span class="fb">肆 · 查看报告</span>
+  </div>
+</div>
+
+<div class="wrap page-body">
+<div class="two-col">
+  <div class="card">
+    <form id="upForm" novalidate>
+      <div class="field">
+        <label><b>户型图</b>（选填，建议上传）</label>
+        <div class="drop" id="drop">
+          <div class="big">⌂</div>
+          点击选择户型图图片（JPG/PNG）<br>
+          <span style="font-size:12px;opacity:.75">内测阶段图片仅保存在本机浏览器，不会上传服务器</span>
+          <img id="preview" style="display:none" alt="户型图预览">
+        </div>
+        <input type="file" id="file" accept="image/*" style="display:none">
+      </div>
+
+      <div class="field">
+        <label class="req"><b>入户门方位</b>（站在户型图前，按上北下南选门所在方位）</label>
+        <div class="gong-grid" id="gongGrid"></div>
+        <div class="hint">八宅以门为伏位起大游年——门的位置是全部判定的起点，请务必按户型图方向选择。拿不准可在备注说明，报告解读时由风水师复核。</div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label><b>小区 / 房源名称</b></label>
+          <input class="input" id="fName" placeholder="例：滨江壹号 3 栋 02 户型" maxlength="40">
+        </div>
+        <div class="field">
+          <label><b>建筑面积</b>（㎡）</label>
+          <input class="input" id="fArea" type="number" min="10" max="2000" step="0.1" placeholder="例：108">
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label><b>房屋朝向</b></label>
+          <select class="input" id="fFacing">
+            <option value="">不确定 / 跳过</option>
+            <option>坐北朝南</option><option>坐南朝北</option>
+            <option>坐东朝西</option><option>坐西朝东</option>
+            <option>坐东北朝西南</option><option>坐西南朝东北</option>
+            <option>坐西北朝东南</option><option>坐东南朝西北</option>
+          </select>
+        </div>
+        <div class="field">
+          <label><b>常住成员</b>（出生年份 + 性别，用于命卦匹配）</label>
+          <div style="display:flex;gap:10px">
+            <input class="input" id="fYear" type="number" min="1920" max="2025" placeholder="例：1990">
+            <select class="input" id="fGender" style="max-width:92px"><option>男</option><option>女</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label><b>备注</b>（选填）</label>
+        <textarea class="input" id="fNote" maxlength="200" placeholder="例：二手房，准备置换；入户门朝向拿不准；家中有老人常住……"></textarea>
+      </div>
+
+      <div id="errBox" style="display:none;color:var(--bad);font-size:13px;margin-bottom:14px"></div>
+      <button type="submit" class="btn btn-gold btn-block">提交，去支付 ¥9.9</button>
+      <div class="hint" style="text-align:center;margin-top:10px">提交即创建订单 · 支付成功后立即生成报告 · 报告永久可回看</div>
+    </form>
+  </div>
+
+  <div>
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="font-size:16px;margin-bottom:12px"><span class="seal">示</span>什么样的户型图可以用</h3>
+      <ul class="vs-list">
+        <li>售楼书 / 中介平台的标准户型图最佳</li>
+        <li>手绘草图也可以，标清入户门和房间即可</li>
+        <li>方向不明时，以户型图默认方向为准（上北下南）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px;margin-bottom:12px"><span class="seal">密</span>隐私说明</h3>
+      <p style="font-size:13px;color:var(--sub)">内测阶段，户型图与填写信息仅保存在你自己的浏览器本地，用于生成报告与订单记录；正式上线后将加密传输并仅用于分析服务，可随时在订单中删除。</p>
+    </div>
+  </div>
+</div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-brand">运 乘 风 水</div>
+    <p>本站内容源自传统居住文化文献与师承经验整理，属于文化参考信息，不构成购房、居住或投资决策建议。</p>
+    <p style="opacity:.6;margin-top:8px">© 2026 运乘风水 · 内测期间功能陆续开放</p>
+  </div>
+</footer>
+
+<script src="assets/js/store.js"></script>
+<script>
+YC.devBootstrap();
+YC.renderNav();
+if(!YC.user()){ YC.requireAuth(function(){ location.reload(); }); }
+
+/* 宫位选择：上北下南布局 */
+var GONGS=[["乾","西北"],["坎","正北"],["艮","东北"],["兑","正西"],null,["震","正东"],["坤","西南"],["离","正南"],["巽","东南"]];
+var selDoor="";
+var grid=document.getElementById("gongGrid");
+GONGS.forEach(function(g){
+  var d=document.createElement("div");
+  if(!g){ d.className="gong-cell center"; d.innerHTML="<b>中</b>宅心"; }
+  else{
+    d.className="gong-cell"; d.innerHTML="<b>"+g[0]+"</b>"+g[1];
+    d.onclick=function(){
+      selDoor=g[0];
+      grid.querySelectorAll(".gong-cell").forEach(function(c){c.classList.remove("sel");});
+      d.classList.add("sel");
+    };
+  }
+  grid.appendChild(d);
+});
+
+/* 图片：本地预览 + 压缩（localStorage 容量保护） */
+var imgData=null;
+var drop=document.getElementById("drop"), file=document.getElementById("file"), preview=document.getElementById("preview");
+drop.onclick=function(){ file.click(); };
+file.onchange=function(){
+  var f=file.files[0]; if(!f) return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    var im=new Image();
+    im.onload=function(){
+      var max=1000, w=im.width, h=im.height;
+      if(w>max){ h=Math.round(h*max/w); w=max; }
+      var cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+      cv.getContext("2d").drawImage(im,0,0,w,h);
+      imgData=cv.toDataURL("image/jpeg",0.72);
+      preview.src=imgData; preview.style.display="block";
+    };
+    im.src=rd.result;
+  };
+  rd.readAsDataURL(f);
+};
+
+document.getElementById("upForm").onsubmit=function(e){
+  e.preventDefault();
+  var err=document.getElementById("errBox");
+  if(!YC.user()){ YC.requireAuth(function(){ location.reload(); }); return; }
+  if(!selDoor){ err.style.display="block"; err.textContent="请选择入户门方位（这是八宅判定的起点，必选）。"; return; }
+  err.style.display="none";
+  var yr=parseInt(document.getElementById("fYear").value)||null;
+  var draft={
+    img: imgData,
+    name: document.getElementById("fName").value.trim(),
+    area: parseFloat(document.getElementById("fArea").value)||null,
+    door: selDoor,
+    facing: document.getElementById("fFacing").value,
+    birthYear: (yr&&yr>=1920&&yr<=2025)?yr:null,
+    gender: document.getElementById("fGender").value,
+    note: document.getElementById("fNote").value.trim()
+  };
+  YC.createOrder(draft).then(function(o){ location.href="pay.html?oid="+encodeURIComponent(o.id); });
+};
+</script>
+
+</body>
+</html>
+

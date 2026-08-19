@@ -10,126 +10,13 @@
 <meta property="og:description" content="专业八宅风水分析报告，早鸟价9.9元。算法经风水师调教，断语三级溯源。">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23241d10'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23e6c886' font-family='serif'>运</text></svg>">
-<style>
-:root{
-  --bg:#0c0f14; --bg2:#080a0e;
-  --card:#141924; --ink:#ece6d6; --sub:#948d7b;
-  --line:rgba(206,178,124,.16); --line-soft:rgba(206,178,124,.09);
-  --gold:#c9a35c; --gold2:#e6c886;
-  --good:#5cb98a; --bad:#e07a64;
-  --radius:18px;
-  --serif:"Songti SC","STSong","Noto Serif CJK SC",serif;
-  --kai:"FZKai-Z03","KaiTi","STKaiti",serif;
-  --sans:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{background:var(--bg2);scroll-behavior:smooth}
-body{font-family:var(--sans);background:radial-gradient(1100px 480px at 50% -90px, rgba(201,163,92,.10), transparent 62%),linear-gradient(180deg,#0e1218 0%,var(--bg) 38%,var(--bg2) 100%);background-attachment:fixed;color:var(--ink);font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0;z-index:70;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>")}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.35;text-wrap:pretty}
-h2{font-size:clamp(24px,3vw,32px);letter-spacing:.02em;margin-bottom:14px}
-h2 .zh{color:var(--gold)}
-.eyebrow{font-size:12px;color:var(--gold);letter-spacing:.32em;margin-bottom:14px;font-weight:500}
-.section-sub{color:var(--sub);max-width:640px;margin-bottom:36px}
-section{padding:72px 0}
-
-/* 顶栏 */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(12,15,20,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line-soft)}
-.topbar .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:16px}
-.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
-.brand-seal{width:38px;height:38px;border-radius:12px 12px 9px 12px;background:linear-gradient(160deg,#3a2f1a,#221b0e);color:#e6c886;border:1px solid rgba(230,200,134,.4);display:flex;align-items:center;justify-content:center;font-family:var(--kai);font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,.5),0 0 18px rgba(201,163,92,.12)}
-.brand-name{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:.08em}
-.brand-sub{font-size:10.5px;color:#a5906a;letter-spacing:.2em}
-.nav{display:flex;align-items:center;gap:26px}
-.nav a{color:var(--sub);text-decoration:none;font-size:13.5px;letter-spacing:.04em;transition:color .15s}
-.nav a:hover{color:var(--gold2)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border-radius:999px;font-size:14.5px;font-weight:600;letter-spacing:.05em;text-decoration:none;cursor:pointer;border:none;transition:transform .15s,box-shadow .15s}
-.btn-gold{background:linear-gradient(160deg,#e0bd77,#c9a35c);color:#201808;box-shadow:0 8px 24px rgba(201,163,92,.22)}
-.btn-gold:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(201,163,92,.3)}
-.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-.btn-ghost:hover{border-color:var(--gold)}
-.btn-sm{padding:8px 20px;font-size:13px}
-@media(max-width:760px){.nav a:not(.btn){display:none}}
-
-/* Hero */
-.hero{position:relative;padding:96px 0 80px;text-align:left;overflow:hidden}
-.hero::before{content:"";position:absolute;right:-40px;top:40px;width:340px;height:340px;border-radius:50%;border:1px solid rgba(201,163,92,.14);pointer-events:none}
-.hero::after{content:"";position:absolute;right:14px;top:94px;width:232px;height:232px;border-radius:50%;border:1px dashed rgba(201,163,92,.11);pointer-events:none}
-.hero h1{font-size:clamp(34px,5vw,54px);letter-spacing:-.01em;background:linear-gradient(115deg,#f2e9d2 15%,#dfc084 58%,#a8823f 95%);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:20px}
-.hero .lead{color:var(--sub);font-size:16.5px;max-width:520px;margin-bottom:34px}
-.hero .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-.hero .price-note{font-size:12.5px;color:var(--sub);margin-top:14px}
-.price-note b{color:var(--gold2)}
-@media(max-width:760px){.hero::before,.hero::after{display:none}}
-
-/* 卡片通用 */
-.card{background:linear-gradient(180deg,#161b26 0%,#11151d 100%);border:1px solid var(--line-soft);border-radius:var(--radius);box-shadow:0 18px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(230,200,134,.07);padding:28px}
-.seal{width:22px;height:22px;border-radius:7px 7px 5px 7px;background:linear-gradient(160deg,#3a2f1a,#241d10);color:#e6c886;border:1px solid rgba(230,200,134,.32);font-family:var(--kai);font-size:12px;display:inline-flex;align-items:center;justify-content:center;vertical-align:-4px;margin-right:8px}
-
-/* 痛点对比 */
-.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.vs-card.bad .vs-title{color:var(--sub)}
-.vs-card.good{border-color:rgba(201,163,92,.3)}
-.vs-card.good .vs-title{color:var(--gold2)}
-.vs-title{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:16px}
-.vs-list{list-style:none}
-.vs-list li{padding:9px 0 9px 26px;position:relative;font-size:14px;color:var(--sub);border-bottom:1px dashed rgba(206,178,124,.08)}
-.vs-list li:last-child{border-bottom:none}
-.vs-list li::before{content:"";position:absolute;left:2px;top:17px;width:7px;height:7px;border-radius:50%;background:#5a5344}
-.vs-card.good .vs-list li{color:var(--ink)}
-.vs-card.good .vs-list li::before{background:var(--gold)}
-.vs-list b{color:var(--gold2);font-weight:600}
-@media(max-width:760px){.vs-grid{grid-template-columns:1fr}}
-
-/* 流程 */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.step-num{font-family:var(--serif);font-size:34px;color:var(--gold);opacity:.85;margin-bottom:10px}
-.step h3{font-size:17px;margin-bottom:10px}
-.step p{font-size:13.5px;color:var(--sub)}
-@media(max-width:760px){.steps{grid-template-columns:1fr}}
-
-/* 专业背书 */
-.proof-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.proof h3{font-size:16px;margin-bottom:10px}
-.proof p{font-size:13.5px;color:var(--sub)}
-.proof .src-tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.src-tag{font-size:11px;padding:3px 12px;border-radius:999px;letter-spacing:.06em}
-.src-1{background:rgba(84,104,138,.25);color:#9db4d6;border:1px solid rgba(84,104,138,.4)}
-.src-2{background:rgba(201,163,92,.15);color:var(--gold2);border:1px solid rgba(201,163,92,.35)}
-.src-3{background:rgba(125,97,82,.2);color:#c4a68e;border:1px solid rgba(125,97,82,.4)}
-@media(max-width:760px){.proof-grid{grid-template-columns:1fr}}
-
-/* 价格 */
-.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
-.price-card{position:relative;display:flex;flex-direction:column}
-.price-card.featured{border-color:rgba(201,163,92,.45)}
-.price-badge{position:absolute;top:-13px;left:28px;background:linear-gradient(160deg,#e0bd77,#c9a35c);color:#201808;font-size:11.5px;font-weight:700;padding:4px 14px;border-radius:999px;letter-spacing:.1em}
-.price-num{font-family:var(--serif);font-size:52px;font-weight:700;color:var(--gold2);margin:8px 0 4px}
-.price-num small{font-size:15px;color:var(--sub);font-weight:400}
-.price-old{font-size:13px;color:var(--sub);text-decoration:line-through}
-.price-list{list-style:none;margin:18px 0 24px;flex:1}
-.price-list li{padding:7px 0 7px 24px;position:relative;font-size:13.5px;color:var(--sub)}
-.price-list li::before{content:"✓";position:absolute;left:0;color:var(--good);font-weight:700}
-.price-card h3{font-size:17px}
-@media(max-width:760px){.price-grid{grid-template-columns:1fr}}
-
-/* FAQ */
-.faq-item{border-bottom:1px solid var(--line-soft);padding:20px 0}
-.faq-item:last-child{border-bottom:none}
-.faq-item h3{font-size:15.5px;margin-bottom:8px;color:var(--ink)}
-.faq-item p{font-size:13.5px;color:var(--sub)}
-
-/* 页脚 */
-footer{border-top:1px solid var(--line-soft);padding:36px 0 30px;color:var(--sub);font-size:12.5px;line-height:2}
-footer .foot-brand{font-family:var(--kai);color:var(--gold);font-size:15px;letter-spacing:.24em;margin-bottom:8px}
-</style>
+<link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
 
 <header class="topbar">
   <div class="wrap">
-    <a class="brand" href="#top">
+    <a class="brand" href="index.html">
       <span class="brand-seal">运</span>
       <span><span class="brand-name">运乘风水</span><br><span class="brand-sub">YUNCHENG · 户型居住环境分析</span></span>
     </a>
@@ -139,7 +26,7 @@ footer .foot-brand{font-family:var(--kai);color:var(--gold);font-size:15px;lette
       <a href="#proof">专业依据</a>
       <a href="#price">价格</a>
       <a href="#faq">常见问题</a>
-      <a class="btn btn-gold btn-sm" href="#price">上传户型图</a>
+      <a class="btn btn-gold btn-sm" href="upload.html">上传户型图</a>
     </nav>
   </div>
 </header>
@@ -152,7 +39,7 @@ footer .foot-brand{font-family:var(--kai);color:var(--gold);font-size:15px;lette
     <h1>买房置换前<br>先看清这个户型的气场</h1>
     <p class="lead">上传户型图，3 分钟获得一份专业八宅风水分析报告：门主灶落宫、吉凶判定、问题诊断与化解建议。算法源自《阳宅爱众篇》，经执业风水师逐条调教。</p>
     <div class="cta-row">
-      <a class="btn btn-gold" href="#price">立即上传户型图</a>
+      <a class="btn btn-gold" href="upload.html">立即上传户型图</a>
       <a class="btn btn-ghost" href="#proof">看看专业在哪</a>
     </div>
     <p class="price-note">早鸟体验价 <b>¥9.9</b> / 份报告（原价 ¥99）· 支持微信登录 · 报告永久可回看</p>
@@ -257,7 +144,7 @@ footer .foot-brand{font-family:var(--kai);color:var(--gold);font-size:15px;lette
           <li>命卦匹配（宅命相配校验）</li>
           <li>断语三级溯源，永久回看</li>
         </ul>
-        <a class="btn btn-gold" href="#faq">上传户型图，开始分析</a>
+        <a class="btn btn-gold" href="upload.html">上传户型图，开始分析</a>
       </div>
       <div class="card price-card">
         <h3>风水师人工服务</h3>
@@ -268,7 +155,7 @@ footer .foot-brand{font-family:var(--kai);color:var(--gold);font-size:15px;lette
           <li>预约线下上门勘宅指导</li>
           <li>装修布局调整咨询</li>
         </ul>
-        <a class="btn btn-ghost" href="#faq">先出报告，再约师傅</a>
+        <a class="btn btn-ghost" href="upload.html">先出报告，再约师傅</a>
       </div>
     </div>
   </div>
@@ -326,5 +213,9 @@ footer .foot-brand{font-family:var(--kai);color:var(--gold);font-size:15px;lette
 }
 </script>
 
+<script src="assets/js/store.js"></script>
+<script>YC.renderNav();</script>
+
 </body>
 </html>
+
