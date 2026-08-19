@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>运乘风水 - 专业户型风水分析报告 | 购房风水 · 八宅堪舆 · 户型图解析</title>
+<meta name="description" content="上传户型图，3分钟获得专业八宅风水分析报告。基于《阳宅爱众篇》大游年算法与执业风水师调教规则，断语三级溯源可查。早鸟体验价9.9元，另有风水师企业微信一对一解读与线下上门指导预约。">
+<meta name="keywords" content="户型风水,购房风水,八宅风水,风水分析,户型图解析,阳宅爱众篇,大游年,二手房置换,新房风水,风水报告,运乘风水">
+<meta property="og:title" content="运乘风水 - 上传户型图，3分钟看清户型吉凶">
+<meta property="og:description" content="专业八宅风水分析报告，早鸟价9.9元。算法经风水师调教，断语三级溯源。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23241d10'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23e6c886' font-family='serif'>运</text></svg>">
+<style>
+:root{
+  --bg:#0c0f14; --bg2:#080a0e;
+  --card:#141924; --ink:#ece6d6; --sub:#948d7b;
+  --line:rgba(206,178,124,.16); --line-soft:rgba(206,178,124,.09);
+  --gold:#c9a35c; --gold2:#e6c886;
+  --good:#5cb98a; --bad:#e07a64;
+  --radius:18px;
+  --serif:"Songti SC","STSong","Noto Serif CJK SC",serif;
+  --kai:"FZKai-Z03","KaiTi","STKaiti",serif;
+  --sans:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg2);scroll-behavior:smooth}
+body{font-family:var(--sans);background:radial-gradient(1100px 480px at 50% -90px, rgba(201,163,92,.10), transparent 62%),linear-gradient(180deg,#0e1218 0%,var(--bg) 38%,var(--bg2) 100%);background-attachment:fixed;color:var(--ink);font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:70;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>")}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.35;text-wrap:pretty}
+h2{font-size:clamp(24px,3vw,32px);letter-spacing:.02em;margin-bottom:14px}
+h2 .zh{color:var(--gold)}
+.eyebrow{font-size:12px;color:var(--gold);letter-spacing:.32em;margin-bottom:14px;font-weight:500}
+.section-sub{color:var(--sub);max-width:640px;margin-bottom:36px}
+section{padding:72px 0}
+
+/* 顶栏 */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(12,15,20,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line-soft)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+.brand-seal{width:38px;height:38px;border-radius:12px 12px 9px 12px;background:linear-gradient(160deg,#3a2f1a,#221b0e);color:#e6c886;border:1px solid rgba(230,200,134,.4);display:flex;align-items:center;justify-content:center;font-family:var(--kai);font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,.5),0 0 18px rgba(201,163,92,.12)}
+.brand-name{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:.08em}
+.brand-sub{font-size:10.5px;color:#a5906a;letter-spacing:.2em}
+.nav{display:flex;align-items:center;gap:26px}
+.nav a{color:var(--sub);text-decoration:none;font-size:13.5px;letter-spacing:.04em;transition:color .15s}
+.nav a:hover{color:var(--gold2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border-radius:999px;font-size:14.5px;font-weight:600;letter-spacing:.05em;text-decoration:none;cursor:pointer;border:none;transition:transform .15s,box-shadow .15s}
+.btn-gold{background:linear-gradient(160deg,#e0bd77,#c9a35c);color:#201808;box-shadow:0 8px 24px rgba(201,163,92,.22)}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 12px 30px rgba(201,163,92,.3)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--gold)}
+.btn-sm{padding:8px 20px;font-size:13px}
+@media(max-width:760px){.nav a:not(.btn){display:none}}
+
+/* Hero */
+.hero{position:relative;padding:96px 0 80px;text-align:left;overflow:hidden}
+.hero::before{content:"";position:absolute;right:-40px;top:40px;width:340px;height:340px;border-radius:50%;border:1px solid rgba(201,163,92,.14);pointer-events:none}
+.hero::after{content:"";position:absolute;right:14px;top:94px;width:232px;height:232px;border-radius:50%;border:1px dashed rgba(201,163,92,.11);pointer-events:none}
+.hero h1{font-size:clamp(34px,5vw,54px);letter-spacing:-.01em;background:linear-gradient(115deg,#f2e9d2 15%,#dfc084 58%,#a8823f 95%);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:20px}
+.hero .lead{color:var(--sub);font-size:16.5px;max-width:520px;margin-bottom:34px}
+.hero .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.hero .price-note{font-size:12.5px;color:var(--sub);margin-top:14px}
+.price-note b{color:var(--gold2)}
+@media(max-width:760px){.hero::before,.hero::after{display:none}}
+
+/* 卡片通用 */
+.card{background:linear-gradient(180deg,#161b26 0%,#11151d 100%);border:1px solid var(--line-soft);border-radius:var(--radius);box-shadow:0 18px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(230,200,134,.07);padding:28px}
+.seal{width:22px;height:22px;border-radius:7px 7px 5px 7px;background:linear-gradient(160deg,#3a2f1a,#241d10);color:#e6c886;border:1px solid rgba(230,200,134,.32);font-family:var(--kai);font-size:12px;display:inline-flex;align-items:center;justify-content:center;vertical-align:-4px;margin-right:8px}
+
+/* 痛点对比 */
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.vs-card.bad .vs-title{color:var(--sub)}
+.vs-card.good{border-color:rgba(201,163,92,.3)}
+.vs-card.good .vs-title{color:var(--gold2)}
+.vs-title{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:16px}
+.vs-list{list-style:none}
+.vs-list li{padding:9px 0 9px 26px;position:relative;font-size:14px;color:var(--sub);border-bottom:1px dashed rgba(206,178,124,.08)}
+.vs-list li:last-child{border-bottom:none}
+.vs-list li::before{content:"";position:absolute;left:2px;top:17px;width:7px;height:7px;border-radius:50%;background:#5a5344}
+.vs-card.good .vs-list li{color:var(--ink)}
+.vs-card.good .vs-list li::before{background:var(--gold)}
+.vs-list b{color:var(--gold2);font-weight:600}
+@media(max-width:760px){.vs-grid{grid-template-columns:1fr}}
+
+/* 流程 */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.step-num{font-family:var(--serif);font-size:34px;color:var(--gold);opacity:.85;margin-bottom:10px}
+.step h3{font-size:17px;margin-bottom:10px}
+.step p{font-size:13.5px;color:var(--sub)}
+@media(max-width:760px){.steps{grid-template-columns:1fr}}
+
+/* 专业背书 */
+.proof-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.proof h3{font-size:16px;margin-bottom:10px}
+.proof p{font-size:13.5px;color:var(--sub)}
+.proof .src-tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.src-tag{font-size:11px;padding:3px 12px;border-radius:999px;letter-spacing:.06em}
+.src-1{background:rgba(84,104,138,.25);color:#9db4d6;border:1px solid rgba(84,104,138,.4)}
+.src-2{background:rgba(201,163,92,.15);color:var(--gold2);border:1px solid rgba(201,163,92,.35)}
+.src-3{background:rgba(125,97,82,.2);color:#c4a68e;border:1px solid rgba(125,97,82,.4)}
+@media(max-width:760px){.proof-grid{grid-template-columns:1fr}}
+
+/* 价格 */
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+.price-card{position:relative;display:flex;flex-direction:column}
+.price-card.featured{border-color:rgba(201,163,92,.45)}
+.price-badge{position:absolute;top:-13px;left:28px;background:linear-gradient(160deg,#e0bd77,#c9a35c);color:#201808;font-size:11.5px;font-weight:700;padding:4px 14px;border-radius:999px;letter-spacing:.1em}
+.price-num{font-family:var(--serif);font-size:52px;font-weight:700;color:var(--gold2);margin:8px 0 4px}
+.price-num small{font-size:15px;color:var(--sub);font-weight:400}
+.price-old{font-size:13px;color:var(--sub);text-decoration:line-through}
+.price-list{list-style:none;margin:18px 0 24px;flex:1}
+.price-list li{padding:7px 0 7px 24px;position:relative;font-size:13.5px;color:var(--sub)}
+.price-list li::before{content:"✓";position:absolute;left:0;color:var(--good);font-weight:700}
+.price-card h3{font-size:17px}
+@media(max-width:760px){.price-grid{grid-template-columns:1fr}}
+
+/* FAQ */
+.faq-item{border-bottom:1px solid var(--line-soft);padding:20px 0}
+.faq-item:last-child{border-bottom:none}
+.faq-item h3{font-size:15.5px;margin-bottom:8px;color:var(--ink)}
+.faq-item p{font-size:13.5px;color:var(--sub)}
+
+/* 页脚 */
+footer{border-top:1px solid var(--line-soft);padding:36px 0 30px;color:var(--sub);font-size:12.5px;line-height:2}
+footer .foot-brand{font-family:var(--kai);color:var(--gold);font-size:15px;letter-spacing:.24em;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <span class="brand-seal">运</span>
+      <span><span class="brand-name">运乘风水</span><br><span class="brand-sub">YUNCHENG · 户型居住环境分析</span></span>
+    </a>
+    <nav class="nav">
+      <a href="#why">为什么</a>
+      <a href="#flow">服务流程</a>
+      <a href="#proof">专业依据</a>
+      <a href="#price">价格</a>
+      <a href="#faq">常见问题</a>
+      <a class="btn btn-gold btn-sm" href="#price">上传户型图</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">观其门 · 察其气 · 断其吉凶</div>
+    <h1>买房置换前<br>先看清这个户型的气场</h1>
+    <p class="lead">上传户型图，3 分钟获得一份专业八宅风水分析报告：门主灶落宫、吉凶判定、问题诊断与化解建议。算法源自《阳宅爱众篇》，经执业风水师逐条调教。</p>
+    <div class="cta-row">
+      <a class="btn btn-gold" href="#price">立即上传户型图</a>
+      <a class="btn btn-ghost" href="#proof">看看专业在哪</a>
+    </div>
+    <p class="price-note">早鸟体验价 <b>¥9.9</b> / 份报告（原价 ¥99）· 支持微信登录 · 报告永久可回看</p>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <div class="eyebrow">WHY · 为什么需要</div>
+    <h2>改善居住品质，装修之外还有<span class="zh">居住气场</span></h2>
+    <p class="section-sub">二手房置换、新房选购，本质都是为了住得更好。装修解决的是硬件，户型格局的气场是传统居住文化里同样重要的一环。</p>
+    <div class="vs-grid">
+      <div class="card vs-card bad">
+        <div class="vs-title">线下请风水师的痛点</div>
+        <ul class="vs-list">
+          <li>流派众多说法不一，水平好坏无从判断</li>
+          <li>按房屋面积/单价收费，动辄数百到数千元</li>
+          <li>口头结论无凭据，事后无法复核追溯</li>
+          <li>看房前想快速筛选户型，约师傅太慢</li>
+        </ul>
+      </div>
+      <div class="card vs-card good">
+        <div class="vs-title">运乘风水的做法</div>
+        <ul class="vs-list">
+          <li><b>算法统一口径</b>：八宅大游年古法，经执业风水师调教</li>
+          <li><b>9.9 元一份</b>：一杯咖啡钱，先筛户型再决定要不要深看</li>
+          <li><b>断语三级溯源</b>：原书明文 / 师承口径 / 推演，逐条标注</li>
+          <li><b>3 分钟出报告</b>：可永久回看，还能约师傅人工解读</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="wrap">
+    <div class="eyebrow">FLOW · 服务流程</div>
+    <h2>三步，拿到你的<span class="zh">户型分析报告</span></h2>
+    <p class="section-sub">不需要任何风水基础，按提示操作即可。</p>
+    <div class="steps">
+      <div class="card step">
+        <div class="step-num">壹</div>
+        <h3><span class="seal">传</span>上传户型图</h3>
+        <p>微信一键登录后，上传在售房源的户型图，补充朝向等基本信息。支持标注入户门位置与九宫校准，所见即所得。</p>
+      </div>
+      <div class="card step">
+        <div class="step-num">贰</div>
+        <h3><span class="seal">析</span>算法自动分析</h3>
+        <p>以门为伏位起大游年，八星随门而转；判定每个房间的落宫吉凶、星宫生克、气之流通，找出问题点并给出化解方向。</p>
+      </div>
+      <div class="card step">
+        <div class="step-num">叁</div>
+        <h3><span class="seal">读</span>报告 + 人工解读</h3>
+        <p>报告 3 分钟内生成，永久保存可回看。看不懂的地方，企业微信直接聊执业风水师；需要深看，可预约线下上门。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="wrap">
+    <div class="eyebrow">PROOF · 专业依据</div>
+    <h2>专业，是可以被<span class="zh">验证</span>的</h2>
+    <p class="section-sub">我们把"专业"拆成可核查的东西：古籍出处、师承口径、程序化验算。</p>
+    <div class="proof-grid">
+      <div class="card proof">
+        <h3><span class="seal">书</span>源自《阳宅爱众篇》</h3>
+        <p>八宅派经典，清·张觉正著。大游年歌、星宫生克、四格穿宫、三元紫白等规则全部数字化，逐条标注书页出处。</p>
+        <div class="src-tags"><span class="src-tag src-1">原书明文</span><span class="src-tag src-2">师承规则</span><span class="src-tag src-3">逻辑推演</span></div>
+      </div>
+      <div class="card proof">
+        <h3><span class="seal">师</span>执业风水师调教</h3>
+        <p>气法四态（流通/窝气/死气/背气）与化解法门来自师承实战口径，与古籍规则分级标注、互不混淆。</p>
+      </div>
+      <div class="card proof">
+        <h3><span class="seal">算</span>引擎级对账</h3>
+        <p>64 组门宫组合判定与参考实现逐项对账一致，规则改动可回归验证——不是随口一说的"大师断语"。</p>
+      </div>
+      <div class="card proof">
+        <h3><span class="seal">师</span>真人兜底</h3>
+        <p>报告只是入门判断。拿不准的，企业微信一对一解读；重要的事情，预约师傅线下上门复核。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="price">
+  <div class="wrap">
+    <div class="eyebrow">PRICE · 服务价格</div>
+    <h2>先用 9.9 元，筛掉<span class="zh">不合适的户型</span></h2>
+    <p class="section-sub">线下勘宅按面积收费的时代，先花一杯咖啡的钱做基础判断。</p>
+    <div class="price-grid">
+      <div class="card price-card featured">
+        <span class="price-badge">早鸟价</span>
+        <h3>户型分析报告</h3>
+        <div class="price-num">¥9.9<small> / 份</small></div>
+        <div class="price-old">原价 ¥99</div>
+        <ul class="price-list">
+          <li>门主灶八宫落星与吉凶判定</li>
+          <li>诊断要点：问题房间 + 可能发生什么</li>
+          <li>化解建议与改门对比参考</li>
+          <li>命卦匹配（宅命相配校验）</li>
+          <li>断语三级溯源，永久回看</li>
+        </ul>
+        <a class="btn btn-gold" href="#faq">上传户型图，开始分析</a>
+      </div>
+      <div class="card price-card">
+        <h3>风水师人工服务</h3>
+        <div class="price-num" style="font-size:34px">一对一</div>
+        <ul class="price-list">
+          <li>企业微信私聊解读你的报告</li>
+          <li>多户型对比筛选建议</li>
+          <li>预约线下上门勘宅指导</li>
+          <li>装修布局调整咨询</li>
+        </ul>
+        <a class="btn btn-ghost" href="#faq">先出报告，再约师傅</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="eyebrow">FAQ · 常见问题</div>
+    <h2>你可能想问</h2>
+    <div class="faq-item">
+      <h3>没有风水基础能看懂报告吗？</h3>
+      <p>可以。报告用"每个房间吉凶 + 可能发生什么 + 怎么化解"的结构呈现，不用任何术语基础；每个结论都附出处标注，想深究也有路径。</p>
+    </div>
+    <div class="faq-item">
+      <h3>需要实地看房或提供精确坐向吗？</h3>
+      <p>不需要。上传户型图后，按页面提示标注入户门位置、校准九宫方向即可。精确结论仍以现场罗盘复核为准，报告中会注明这一点。</p>
+    </div>
+    <div class="faq-item">
+      <h3>9.9 元的报告和线下师傅有什么区别？</h3>
+      <p>报告解决"入门筛选"：户型格局的吉凶分布、明显问题与化解方向。它不能替代现场勘宅——所以报告页可以直接约师傅人工解读和上门，两者是衔接关系。</p>
+    </div>
+    <div class="faq-item">
+      <h3>你们的风水依据是什么流派？</h3>
+      <p>八宅派，算法规则源自《阳宅爱众篇》（清·张觉正），并由执业风水师按实战经验调教、分级标注。我们不混用多流派口径，保证结论一致可复核。</p>
+    </div>
+    <div class="faq-item">
+      <h3>报告内容可以作为购房决策依据吗？</h3>
+      <p>报告内容源自传统居住文化文献与师承经验，属于文化与环境参考信息，不构成购房、居住或投资决策建议。重要决策请结合实际情况并咨询专业人士。</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-brand">运 乘 风 水</div>
+    <p>观其门 · 察其气 · 断其吉凶 ｜ 户型居住环境分析服务</p>
+    <p>本站内容源自传统居住文化文献与师承经验整理，属于文化参考信息，不构成购房、居住或投资决策建议。</p>
+    <p style="opacity:.6;margin-top:8px">© 2026 运乘风水 · 内测期间功能陆续开放</p>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"没有风水基础能看懂报告吗？","acceptedAnswer":{"@type":"Answer","text":"可以。报告用每个房间吉凶、可能发生什么、怎么化解的结构呈现，每个结论附出处标注。"}},
+    {"@type":"Question","name":"需要实地看房或提供精确坐向吗？","acceptedAnswer":{"@type":"Answer","text":"不需要。上传户型图后按提示标注入户门位置、校准九宫方向即可，精确结论以现场罗盘复核为准。"}},
+    {"@type":"Question","name":"9.9元的报告和线下师傅有什么区别？","acceptedAnswer":{"@type":"Answer","text":"报告解决入门筛选：吉凶分布、明显问题与化解方向；不能替代现场勘宅，报告页可约师傅人工解读和上门。"}},
+    {"@type":"Question","name":"你们的风水依据是什么流派？","acceptedAnswer":{"@type":"Answer","text":"八宅派，算法规则源自《阳宅爱众篇》（清·张觉正），由执业风水师调教并分级标注。"}},
+    {"@type":"Question","name":"报告内容可以作为购房决策依据吗？","acceptedAnswer":{"@type":"Answer","text":"报告属传统居住文化参考信息，不构成购房、居住或投资决策建议。"}}
+  ]
+}
+</script>
+
+</body>
+</html>
