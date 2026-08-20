@@ -51,117 +51,116 @@
   </div>
 </footer>
 
+<script src="assets/js/config.js"></script>
 <script src="assets/js/engine.js"></script>
 <script src="assets/js/store.js"></script>
 <script>
+(function(){ "use strict";
 YC.devBootstrap();
 YC.renderNav();
-var E=YC_ENG, main=document.getElementById("main");
-var oid=new URLSearchParams(location.search).get("oid")||"";
-var order=YC.getOrder(oid);
+var main = document.getElementById("main");
 
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function isJi(b){ return b==="大吉" || b.indexOf("中吉")===0; }
 function badgeBase(b){
   if(isJi(b)) return '<span class="badge b-good">'+b+'</span>';
   if(b==="大凶") return '<span class="badge b-bad">大凶</span>';
   return '<span class="badge b-wait">'+b+'</span>';
 }
-function isJi(b){ return b==="大吉" || b.indexOf("中吉")===0; }
 function srcBadge(level){
   var cls={"原书明文":"src-1","原书明文+师承":"src-2","原书明文+演绎":"src-3","师承":"src-2","演绎":"src-3"}[level]||"src-3";
   return '<span class="src-tag '+cls+'">'+level+'</span>';
 }
-function yiji(base){
-  return isJi(base)
-    ? "吉位宜动宜通：宜高大明亮、宜开门窗、可作卧室或常活动区（八星吉凶总要：临宫得位福禄增）"
-    : "凶位宜静宜闭：宜整洁少动、可作卫浴储物；储物须留泄口，勿封死成窝";
-}
 
-if(!order){
-  main.innerHTML='<div class="card empty"><div class="e-seal">空</div><p>没有找到这份报告对应的订单。</p><div style="margin-top:18px"><a class="btn btn-gold" href="upload.html">上传户型图，生成报告</a></div></div>';
-}else if(order.status!=="paid"){
-  location.replace("pay.html?oid="+encodeURIComponent(order.id));
-}else{
-  var p=order.plan||{}, door=p.door||"兑";
-  var sum=E.doorSummary(door);
-  var check=E.selfCheck();
-  document.getElementById("rMeta").textContent=
-    "订单 "+order.id+" · "+(p.name||"未命名房源")+" · 生成于 "+YC.fmtTime(order.paidAt||order.createdAt);
+var oid = new URLSearchParams(location.search).get("oid") || "";
+Promise.resolve(YC.getOrder(oid)).then(function(order){
+  if(!order){
+    main.innerHTML = '<div class="card empty"><div class="e-seal">空</div><p>没有找到这份报告对应的订单。</p><div style="margin-top:18px"><a class="btn btn-gold" href="upload.html">上传户型图，生成报告</a></div></div>';
+    return;
+  }
+  if(order.status !== "paid"){ location.replace("pay.html?oid=" + encodeURIComponent(order.id)); return; }
+  YC.getReport(order.plan || {}).then(function(r){ render(order, r); })
+    .catch(function(e){
+      main.innerHTML = '<div class="card empty"><div class="e-seal">错</div><p>报告生成失败：' + esc(e.message) + '</p></div>';
+    });
+});
+
+function render(order, r){
+  var p = order.plan || {};
+  document.getElementById("rMeta").textContent =
+    "订单 " + order.id + " · " + (p.name || "未命名房源") + " · 生成于 " + YC.fmtTime(order.paidAt || order.createdAt);
 
   /* ---- 宅况总览 ---- */
-  var ov='<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:14px"><span class="seal">宅</span>宅况总览</h3><dl class="kv">'+
-    '<dt>入户门</dt><dd>门开'+E.DIRNAME[door]+'（'+door+'门伏位）· 属<b style="color:var(--gold2)">'+sum.group+'</b>，从门起大游年顺布八宫，吉凶全从门上论</dd>'+
-    (p.facing?'<dt>房屋朝向</dt><dd class="dim">'+esc(p.facing)+'（记录项，未参与本次判定）</dd>':'')+
-    (p.area?'<dt>建筑面积</dt><dd class="dim">'+p.area+'㎡</dd>':'')+
-    '<dt>吉凶分布</dt><dd>大吉宫 <b style="color:var(--good)">'+sum.ji+'</b> 处 · 中吉宫 <b style="color:var(--gold2)">'+sum.zhongji+'</b> 处 · 大凶宫 <b style="color:var(--bad)">'+sum.daxiong+'</b> 处 · 其余 '+(8-sum.ji-sum.zhongji-sum.daxiong)+' 处</dd>';
-  if(p.birthYear){
-    var mg=E.mingGua(p.birthYear, p.gender||"男");
-    var match=(mg.group==="东四命")===!!E.DONG[door];
-    ov+='<dt>命卦匹配</dt><dd>'+p.birthYear+' 年'+(p.gender||"男")+'命 · '+mg.gua+'卦（'+mg.group+'）——<b style="color:'+(match?"var(--good)":"var(--bad)")+'">'+(match?"与本宅相配":"与本宅不相配，可参考下方改门对比")+'</b><br><span class="dim" style="color:var(--sub);font-size:12px">通行命卦原则（非本书明文）；传统以立春为年界，此处按公历年简化</span></dd>';
+  var ov = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:14px"><span class="seal">宅</span>宅况总览</h3><dl class="kv">'+
+    '<dt>入户门</dt><dd>门开'+r.door_dir+'（'+r.door+'门伏位）· 属<b style="color:var(--gold2)">'+r.group+'</b>，从门起大游年顺布八宫，吉凶全从门上论</dd>'+
+    (p.facing ? '<dt>房屋朝向</dt><dd class="dim">'+esc(p.facing)+'（记录项，未参与本次判定）</dd>' : '')+
+    (p.area ? '<dt>建筑面积</dt><dd class="dim">'+p.area+'㎡</dd>' : '')+
+    '<dt>吉凶分布</dt><dd>大吉宫 <b style="color:var(--good)">'+r.counts.ji+'</b> 处 · 中吉宫 <b style="color:var(--gold2)">'+r.counts.zhongji+'</b> 处 · 大凶宫 <b style="color:var(--bad)">'+r.counts.daxiong+'</b> 处 · 其余 '+(8-r.counts.ji-r.counts.zhongji-r.counts.daxiong)+' 处</dd>';
+  if(r.minggua){
+    var mg = r.minggua;
+    ov += '<dt>命卦匹配</dt><dd>'+p.birthYear+' 年'+(p.gender||"男")+'命 · '+mg.gua+'卦（'+mg.group+'）——<b style="color:'+(mg.match?"var(--good)":"var(--bad)")+'">'+(mg.match?"与本宅相配":"与本宅不相配，可参考下方改门对比")+'</b><br><span class="dim" style="color:var(--sub);font-size:12px">通行命卦原则（非本书明文）；传统以立春为年界，此处按公历年简化</span></dd>';
   }
-  ov+='<dt>引擎校验</dt><dd class="dim">八宅判定引擎回归对账 <b style="color:var(--good)">'+(check.pass?"64/64 通过":"异常")+'</b></dd></dl>';
-  if(p.img) ov+='<div style="margin-top:16px"><div style="font-size:12.5px;color:var(--sub);margin-bottom:8px">已上传户型图</div><img src="'+p.img+'" style="max-width:100%;border-radius:12px;border:1px solid var(--line-soft)" alt="户型图"></div>';
-  if(p.imgDropped) ov+='<div class="hint" style="margin-top:10px">（图片超出本地存储容量，未保存；不影响判定）</div>';
-  if(p.note) ov+='<dl class="kv" style="margin-top:10px"><dt>备注</dt><dd class="dim">'+esc(p.note)+'</dd></dl>';
-  ov+='</div>';
+  ov += '<dt>引擎校验</dt><dd class="dim">八宅判定引擎回归对账 <b style="color:var(--good)">'+(r.engine_check.pass ? (r.engine_check.total+"/"+r.engine_check.total+" 通过") : "异常")+'</b>'+(YC.remote()?"（服务端引擎）":"（本地引擎）")+'</dd></dl>';
+  if(p.img) ov += '<div style="margin-top:16px"><div style="font-size:12.5px;color:var(--sub);margin-bottom:8px">已上传户型图</div><img src="'+p.img+'" style="max-width:100%;border-radius:12px;border:1px solid var(--line-soft)" alt="户型图"></div>';
+  if(p.imgDropped) ov += '<div class="hint" style="margin-top:10px">（图片超出本地存储容量，未保存；不影响判定）</div>';
+  if(p.note) ov += '<dl class="kv" style="margin-top:10px"><dt>备注</dt><dd class="dim">'+esc(p.note)+'</dd></dl>';
+  ov += '</div>';
 
-  /* ---- 九宫星布（上北下南） ---- */
-  var LAYOUT=[["乾"],["坎"],["艮"],["兑"],null,["震"],["坤"],["离"],["巽"]];
-  var grid='<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">宫</span>八宫星布</h3>'+
+  /* ---- 八宫星布（上北下南） ---- */
+  var byGong = {};
+  r.palaces.forEach(function(j){ byGong[j.gong] = j; });
+  var LAYOUT = ["乾","坎","艮","兑",null,"震","坤","离","巽"];
+  var grid = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">宫</span>八宫星布</h3>'+
     '<p style="font-size:12.5px;color:var(--sub);margin-bottom:16px">按上北下南布宫；金框为入户门（伏位）。房间级落宫判定将在「图片识别 + 九宫校准」上线后自动叠加到您的户型图上。</p><div class="palace-grid">';
-  LAYOUT.forEach(function(cell){
-    if(!cell){ grid+='<div class="palace center"><div class="p-dir">中宫</div><div class="p-star">宅心</div><div class="p-ming">气之枢纽</div></div>'; return; }
-    var g=cell[0], j=E.judge(door,g), yx=E.YX[j.star];
-    var cls=isJi(j.base)?"g":(j.base==="大凶"?"x":"m");
-    grid+='<div class="palace '+cls+(g===door?" door":"")+'">'+
-      '<div class="p-dir">'+E.DIRNAME[g]+' · '+g+'</div>'+
+  LAYOUT.forEach(function(g){
+    if(!g){ grid += '<div class="palace center"><div class="p-dir">中宫</div><div class="p-star">宅心</div><div class="p-ming">气之枢纽</div></div>'; return; }
+    var j = byGong[g];
+    var cls = isJi(j.base) ? "g" : (j.base === "大凶" ? "x" : "m");
+    grid += '<div class="palace '+cls+(g===r.door?" door":"")+'">'+
+      '<div class="p-dir">'+j.dir+' · '+g+'</div>'+
       '<div class="p-star">'+j.star+'</div>'+
-      '<div class="p-ming">'+yx.star+' · '+j.base+'</div></div>';
+      '<div class="p-ming">'+j.star_ming+' · '+j.base+'</div></div>';
   });
-  grid+='</div></div>';
+  grid += '</div></div>';
 
-  /* ---- 逐宫判定 ---- */
-  var weight={"大吉":0}; // 排序：大吉 → 中吉 → 次凶 → 大凶
-  function w(b){ return b==="大吉"?0:(b.indexOf("中吉")===0?1:(b==="次凶"?2:3)); }
-  var items=sum.items.slice().sort(function(a,b){return w(a.base)-w(b.base);});
-  var list='<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:16px"><span class="seal">断</span>逐宫判定</h3>';
-  items.forEach(function(j){
-    var yx=E.YX[j.star];
-    list+='<div class="judge-card" style="border-bottom:1px dashed var(--line-soft);padding-bottom:16px">'+
-      '<div class="judge-head"><span class="jh-gong">'+j.gong+'宫 · '+E.DIRNAME[j.gong]+'</span>'+
-      '<span class="jh-star">'+j.star+' · '+yx.star+'</span>'+badgeBase(j.base)+
-      (j.gong===door?'<span class="badge b-gold">入户门 · 伏位</span>':'')+srcBadge(yx.level)+'</div>'+
+  /* ---- 逐宫判定（palaces 已按 大吉→中吉→次凶→大凶 排序） ---- */
+  var list = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:16px"><span class="seal">断</span>逐宫判定</h3>';
+  r.palaces.forEach(function(j){
+    list += '<div class="judge-card" style="border-bottom:1px dashed var(--line-soft);padding-bottom:16px">'+
+      '<div class="judge-head"><span class="jh-gong">'+j.gong+'宫 · '+j.dir+'</span>'+
+      '<span class="jh-star">'+j.star+' · '+j.star_ming+'</span>'+badgeBase(j.base)+
+      (j.gong===r.door ? '<span class="badge b-gold">入户门 · 伏位</span>' : '')+srcBadge(j.level)+'</div>'+
       '<dl class="kv">'+
-      '<dt>星宫关系</dt><dd>'+j.desc+'（'+j.rel+'）</dd>'+
-      (j.note?'<dt>注意</dt><dd style="color:var(--bad)">'+j.note+'</dd>':'')+
-      '<dt>应象</dt><dd class="dim">'+yx.应象+'</dd>'+
-      '<dt>应期</dt><dd class="dim">'+yx.应期+'</dd>'+
-      '<dt>宜忌</dt><dd>'+yiji(j.base)+'</dd>'+
+      '<dt>星宫关系</dt><dd>'+j.rel_desc+'（'+j.rel+'）</dd>'+
+      (j.note ? '<dt>注意</dt><dd style="color:var(--bad)">'+j.note+'</dd>' : '')+
+      '<dt>应象</dt><dd class="dim">'+j.yingxiang+'</dd>'+
+      '<dt>应期</dt><dd class="dim">'+j.yingqi+'</dd>'+
+      '<dt>宜忌</dt><dd>'+j.yiji+'</dd>'+
       '</dl></div>';
   });
-  list+='</div>';
+  list += '</div>';
 
   /* ---- 改门对比 ---- */
-  var cmp=E.compareDoors(), best=cmp[0].door;
-  var tbl='<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">气</span>改门 · 气的走向</h3>'+
+  var best = r.door_compare.length ? r.door_compare[0].door : null;
+  var tbl = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">气</span>改门 · 气的走向</h3>'+
     '<p style="font-size:12.5px;color:var(--sub);margin-bottom:16px">「门为宅主房为宾，门转星移定君臣」——门一换，八星随门整体重排。下表为 8 个门位的吉凶分布对比，供改门或选房参考。</p><div class="tbl-wrap"><table class="tbl">'+
     '<tr><th>门位</th><th>宅组</th><th>大吉</th><th>中吉</th><th>大凶</th><th>备注</th></tr>';
-  cmp.forEach(function(s){
-    var tag = s.door===door ? '<span class="badge b-gold">当前门位</span>' : (s.door===best ? '<span class="badge b-good">较优</span>' : '');
-    tbl+='<tr'+(s.door===door?' class="cur"':'')+'><td>'+s.door+'门（'+E.DIRNAME[s.door]+'）</td><td>'+s.group+'</td>'+
+  r.door_compare.forEach(function(s){
+    var tag = s.door===r.door ? '<span class="badge b-gold">当前门位</span>' : (s.door===best ? '<span class="badge b-good">较优</span>' : '');
+    tbl += '<tr'+(s.door===r.door?' class="cur"':'')+'><td>'+s.door+'门</td><td>'+s.group+'</td>'+
       '<td style="color:var(--good)">'+s.ji+'</td><td style="color:var(--gold2)">'+s.zhongji+'</td><td style="color:var(--bad)">'+s.daxiong+'</td><td>'+tag+'</td></tr>';
   });
-  tbl+='</table></div><div class="hint" style="margin-top:12px">改门涉及承重、楼道与装修限制，本表仅为星位参考；是否可改以实际条件与师傅现场复核为准。</div></div>';
+  tbl += '</table></div><div class="hint" style="margin-top:12px">改门涉及承重、楼道与装修限制，本表仅为星位参考；是否可改以实际条件与师傅现场复核为准。</div></div>';
 
   /* ---- 化解总则 ---- */
-  var hj='<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:14px"><span class="seal">解</span>化解总则</h3>'+
-    '<p style="font-size:14px;margin-bottom:14px">'+E.IRON+'</p><div class="steps" style="grid-template-columns:repeat(2,1fr);gap:12px">';
-  for(var k in E.HUAJIE){ hj+='<div style="border:1px solid var(--line-soft);border-radius:12px;padding:12px 16px"><b style="color:var(--gold2);font-size:13.5px">'+k+'</b><div style="font-size:12.5px;color:var(--sub);margin-top:4px">'+E.HUAJIE[k]+'</div></div>'; }
-  hj+='</div><div class="quote" style="margin-top:18px">'+E.ZONGJUE+'</div>'+
+  var hj = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:14px"><span class="seal">解</span>化解总则</h3>'+
+    '<p style="font-size:14px;margin-bottom:14px">'+r.iron_rule+'</p><div class="steps" style="grid-template-columns:repeat(2,1fr);gap:12px">';
+  for(var k in r.huajie){ hj += '<div style="border:1px solid var(--line-soft);border-radius:12px;padding:12px 16px"><b style="color:var(--gold2);font-size:13.5px">'+k+'</b><div style="font-size:12.5px;color:var(--sub);margin-top:4px">'+r.huajie[k]+'</div></div>'; }
+  hj += '</div><div class="quote" style="margin-top:18px">'+r.zongjue+'</div>'+
     '<div class="hint">气法四态（流通 / 窝气 / 死气 / 背气）与化解法门为师承口径（老唐版），与古籍规则分级标注。</div></div>';
 
   /* ---- 人工服务 CTA ---- */
-  var cta='<div class="card" style="text-align:center;padding:36px 28px">'+
+  var cta = '<div class="card" style="text-align:center;padding:36px 28px">'+
     '<h3 style="font-size:18px;margin-bottom:8px">报告看不懂？让师傅帮你拆</h3>'+
     '<p style="font-size:13px;color:var(--sub);max-width:460px;margin:0 auto 20px">企业微信一对一解读本份报告、多户型对比筛选，或预约线下上门勘宅复核。</p>'+
     '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">'+
@@ -169,11 +168,13 @@ if(!order){
     '<a class="btn btn-ghost" href="#" onclick="alert(\'内测阶段：预约功能接入中\');return false;">预约上门勘宅</a>'+
     '</div></div>';
 
-  var note='<div class="foot-note">溯源：大游年歌（卷一p57-58）· 相宅宗旨（p1）· 星宫生克吉凶论（p85-87）· 八星吉凶总要（p63）· 九星年限应验歌（p88-90）；气法四态为师承规则（老唐版），单独分级。本报告为门位级八宅判定；房间级落宫、窝气/死气/背气诊断将在「图片识别 + 九宫校准」上线后补入本报告（已购订单自动升级）。报告内容属传统居住文化参考信息，不构成购房、居住或投资决策建议。</div>';
+  var note = '<div class="foot-note">溯源：大游年歌（卷一p57-58）· 相宅宗旨（p1）· 星宫生克吉凶论（p85-87）· 八星吉凶总要（p63）· 九星年限应验歌（p88-90）；气法四态为师承规则（老唐版），单独分级。本报告为门位级八宅判定；房间级落宫、窝气/死气/背气诊断将在「图片识别 + 九宫校准」上线后补入本报告（已购订单自动升级）。报告内容属传统居住文化参考信息，不构成购房、居住或投资决策建议。</div>';
 
-  main.innerHTML=ov+grid+list+tbl+hj+cta+note;
+  main.innerHTML = ov + grid + list + tbl + hj + cta + note;
 }
+})();
 </script>
 
 </body>
 </html>
+

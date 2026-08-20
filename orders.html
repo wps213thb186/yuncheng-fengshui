@@ -44,43 +44,50 @@
   </div>
 </footer>
 
+<script src="assets/js/config.js"></script>
 <script src="assets/js/engine.js"></script>
 <script src="assets/js/store.js"></script>
 <script>
+(function(){ "use strict";
 YC.devBootstrap();
 YC.renderNav();
-var main=document.getElementById("main");
+var main = document.getElementById("main");
 
 if(!YC.user()){
-  main.innerHTML='<div class="card empty"><div class="e-seal">单</div><p>登录后即可查看你的订单与报告</p></div>';
+  main.innerHTML = '<div class="card empty"><div class="e-seal">单</div><p>登录后即可查看你的订单与报告</p></div>';
   YC.requireAuth(function(){ location.reload(); });
-}else{
-  var os=YC.listOrders();
-  if(!os.length){
-    main.innerHTML='<div class="card empty"><div class="e-seal">空</div><p>还没有订单。上传一张户型图，3 分钟拿到第一份报告。</p><div style="margin-top:18px"><a class="btn btn-gold" href="upload.html">上传户型图</a></div></div>';
-  }else{
-    var html='<div class="card" style="padding:10px 28px">';
-    os.forEach(function(o){
-      var paid=o.status==="paid";
-      var door=o.plan&&o.plan.door?("入户门·"+o.plan.door+"（"+YC_ENG.DIRNAME[o.plan.door]+"）"):"";
-      var meta=[YC.fmtTime(o.createdAt), door, o.plan&&o.plan.area?(o.plan.area+"㎡"):""].filter(Boolean).join(" · ");
-      html+='<div class="order-row">'+
-        (o.plan&&o.plan.img
-          ? '<div class="order-thumb" style="background-image:url('+o.plan.img+')"></div>'
-          : '<div class="order-thumb">运</div>')+
-        '<div class="order-main"><div class="o-title">'+o.title+' <span style="color:var(--sub);font-size:12px">'+o.id+'</span></div>'+
-        '<div class="o-meta">'+meta+'</div></div>'+
-        '<div class="order-act">'+
-          (paid?'<span class="badge b-good">已出报告</span>':'<span class="badge b-wait">待支付 ¥'+o.amount.toFixed(1)+'</span>')+
-          (paid
-            ? '<a class="btn btn-gold btn-sm" href="report.html?oid='+encodeURIComponent(o.id)+'">查看报告</a>'
-            : '<a class="btn btn-ghost btn-sm" href="pay.html?oid='+encodeURIComponent(o.id)+'">去支付</a>')+
-        '</div></div>';
-    });
-    html+='</div><div class="hint" style="margin-top:14px">内测阶段订单保存在本机浏览器；正式上线后同步到微信账号，换设备也能看。</div>';
-    main.innerHTML=html;
-  }
+  return;
 }
+Promise.resolve(YC.listOrders()).then(function(os){
+  if(!os.length){
+    main.innerHTML = '<div class="card empty"><div class="e-seal">空</div><p>还没有订单。上传一张户型图，3 分钟拿到第一份报告。</p><div style="margin-top:18px"><a class="btn btn-gold" href="upload.html">上传户型图</a></div></div>';
+    return;
+  }
+  var html = '<div class="card" style="padding:10px 28px">';
+  os.forEach(function(o){
+    var paid = o.status === "paid";
+    var door = o.plan && o.plan.door ? ("入户门·" + o.plan.door + "（" + YC_ENG.DIRNAME[o.plan.door] + "）") : "";
+    var meta = [YC.fmtTime(o.createdAt), door, o.plan && o.plan.area ? (o.plan.area + "㎡") : ""].filter(Boolean).join(" · ");
+    html += '<div class="order-row">'+
+      (o.plan && o.plan.img
+        ? '<div class="order-thumb" style="background-image:url(' + o.plan.img + ')"></div>'
+        : '<div class="order-thumb">运</div>')+
+      '<div class="order-main"><div class="o-title">' + o.title + ' <span style="color:var(--sub);font-size:12px">' + o.id + '</span></div>'+
+      '<div class="o-meta">' + meta + '</div></div>'+
+      '<div class="order-act">'+
+        (paid ? '<span class="badge b-good">已出报告</span>' : '<span class="badge b-wait">待支付 ¥' + o.amount.toFixed(1) + '</span>')+
+        (paid
+          ? '<a class="btn btn-gold btn-sm" href="report.html?oid=' + encodeURIComponent(o.id) + '">查看报告</a>'
+          : '<a class="btn btn-ghost btn-sm" href="pay.html?oid=' + encodeURIComponent(o.id) + '">去支付</a>')+
+      '</div></div>';
+  });
+  html += '</div><div class="hint" style="margin-top:14px">'+
+    (YC.remote() ? "订单保存在你的微信账号下，换设备登录也能看。" : "内测阶段订单保存在本机浏览器；正式上线后同步到微信账号，换设备也能看。")+'</div>';
+  main.innerHTML = html;
+}).catch(function(e){
+  main.innerHTML = '<div class="card empty"><div class="e-seal">错</div><p>订单加载失败：' + e.message + '</p></div>';
+});
+})();
 </script>
 
 </body>

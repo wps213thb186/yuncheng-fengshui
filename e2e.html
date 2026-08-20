@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<title>E2E - 运乘风水</title>
+<link rel="stylesheet" href="assets/css/site.css">
+<style>body{padding:40px}pre{background:#0f131b;border:1px solid var(--line-soft);border-radius:12px;padding:20px;font-size:12.5px;white-space:pre-wrap;word-break:break-all}</style>
+</head>
+<body>
+<h2 style="margin-bottom:14px">端到端自测（远程 API 模式）</h2>
+<pre id="probe">RUNNING…</pre>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/engine.js"></script>
+<script src="assets/js/store.js"></script>
+<script>
+(function(){ "use strict";
+var out = [], fail = 0;
+function log(name, ok, detail){ out.push((ok ? "PASS" : "FAIL") + "  " + name + (detail ? "  " + detail : "")); if(!ok) fail++; }
+function finish(){
+  document.getElementById("probe").textContent = "PROBE_RESULT\n" + out.join("\n") + "\n" + (fail ? "E2E_FAIL " + fail : "E2E_PASS");
+  document.title = fail ? "E2E FAIL" : "E2E PASS";
+}
+if(!YC.remote()){
+  document.getElementById("probe").textContent = "PROBE_RESULT\nSKIP  本地模式（YC_API_BASE 为空），无需远程联测\nE2E_SKIP";
+  document.title = "E2E SKIP";
+  return;
+}
+var oid = null;
+YC.serverHealth().then(function(h){
+  log("health 64/64", h && h.ok && h.engine === "64/64", h && h.engine);
+  return YC.loginMobile("e2e_" + Date.now());
+}).then(function(u){
+  log("mobile login", !!u && !!YC.user(), u && u.openid);
+  return YC.createOrder({ door: "艮", name: "E2E联测", area: 99, birthYear: 1988, gender: "女" });
+}).then(function(o){
+  oid = o.id;
+  log("create order pending", o.status === "pending_payment" && o.amount === 9.9, o.id);
+  return YC.payOrder(oid, "jsapi");
+}).then(function(o){
+  log("pay -> paid", o && o.status === "paid", o && o.status);
+  return YC.getOrder(oid);
+}).then(function(o){
+  log("getOrder paid", o && o.status === "paid" && o.plan.door === "艮");
+  return YC.getReport(o.plan);
+}).then(function(r){
+  log("report 8 palaces", r.palaces && r.palaces.length === 8);
+  log("report engine pass", r.engine_check && r.engine_check.pass === true);
+  // 与本地 JS 引擎对账（口径一致性，不写死期望值）
+  var local = YC.localReport("艮", 1988, "女");
+  log("report minggua 与本地引擎一致", r.minggua && local.minggua && r.minggua.gua === local.minggua.gua, r.minggua && (r.minggua.gua + " vs " + local.minggua.gua));
+  log("report counts 与本地引擎一致", JSON.stringify(r.counts) === JSON.stringify(local.counts), JSON.stringify(r.counts));
+  var apiStars = r.palaces.map(function(p){ return p.gong + p.star + p.base; }).join("|");
+  var localStars = local.palaces.map(function(p){ return p.gong + p.star + p.base; }).join("|");
+  log("逐宫判定与本地引擎一致", apiStars === localStars);
+  log("report door 艮 西四宅", r.group === "西四宅");
+  return YC.listOrders();
+}).then(function(os){
+  log("orders contains", os.some(function(o){ return o.id === oid; }), "count=" + os.length);
+  finish();
+}).catch(function(e){
+  log("exception", false, e.message || String(e));
+  finish();
+});
+})();
+</script>
+</body>
+</html>

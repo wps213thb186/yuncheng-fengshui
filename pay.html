@@ -49,30 +49,32 @@
   </div>
 </footer>
 
+<script src="assets/js/config.js"></script>
 <script src="assets/js/store.js"></script>
 <script>
+(function(){ "use strict";
 YC.devBootstrap();
 YC.renderNav();
-var main=document.getElementById("main");
-var oid=new URLSearchParams(location.search).get("oid")||"";
-var order=YC.getOrder(oid);
+var main = document.getElementById("main");
+var oid = new URLSearchParams(location.search).get("oid") || "";
 
 function planLine(p){
-  var seg=[];
+  var seg = [];
   if(p.name) seg.push(p.name);
-  if(p.area) seg.push(p.area+"㎡");
-  if(p.door) seg.push("入户门·"+p.door+"（方位宫）");
+  if(p.area) seg.push(p.area + "㎡");
+  if(p.door) seg.push("入户门·" + p.door);
   if(p.facing) seg.push(p.facing);
-  return seg.join(" · ")||"未填写房源信息";
+  return seg.join(" · ") || "未填写房源信息";
 }
 
-if(!order){
-  main.innerHTML='<div class="card empty"><div class="e-seal">空</div><p>没有找到这个订单，可能已过期。</p><div style="margin-top:18px"><a class="btn btn-gold" href="upload.html">重新上传户型图</a></div></div>';
-}else if(order.status==="paid"){
-  location.replace("report.html?oid="+encodeURIComponent(order.id));
-}else{
-  var mobile=YC.isMobile();
-  main.innerHTML=
+Promise.resolve(YC.getOrder(oid)).then(function(order){
+  if(!order){
+    main.innerHTML = '<div class="card empty"><div class="e-seal">空</div><p>没有找到这个订单，可能已过期。</p><div style="margin-top:18px"><a class="btn btn-gold" href="upload.html">重新上传户型图</a></div></div>';
+    return;
+  }
+  if(order.status === "paid"){ location.replace("report.html?oid=" + encodeURIComponent(order.id)); return; }
+  var mobile = YC.isMobile();
+  main.innerHTML =
   '<div class="two-col">'+
     '<div class="card">'+
       '<h3 style="font-size:16px;margin-bottom:14px"><span class="seal">单</span>订单信息</h3>'+
@@ -97,18 +99,32 @@ if(!order){
           '<div class="qr"><canvas id="payQR" width="200" height="200"></canvas></div>'+
           '<div style="margin-top:14px"><button class="btn btn-gold" id="payBtn">模拟：支付成功</button></div>')+
       '<div class="hint" style="margin-top:16px">内测阶段不发生真实扣款；支付成功后将自动生成分析报告</div>'+
+      '<div id="payErr" style="color:var(--bad);font-size:12.5px;margin-top:8px"></div>'+
       '<div style="margin-top:14px"><a href="orders.html" style="font-size:12.5px;color:var(--sub)">暂不支付，去订单中心</a></div>'+
     '</div>'+
   '</div>';
-  var c=document.getElementById("payQR");
-  if(c) YC.pseudoQR(c, "pay:"+order.id);
-  document.getElementById("payBtn").onclick=function(){
-    var b=this; b.disabled=true; b.textContent="支付确认中…";
-    YC.payOrder(order.id).then(function(){
-      location.href="report.html?oid="+encodeURIComponent(order.id);
+  var c = document.getElementById("payQR");
+  if(c) YC.pseudoQR(c, "pay:" + order.id);
+  document.getElementById("payBtn").onclick = function(){
+    var b = this; b.disabled = true; b.textContent = "支付确认中…";
+    YC.payOrder(order.id, mobile ? "jsapi" : "native").then(function(o2){
+      if(o2 && o2.status === "paid"){ location.href = "report.html?oid=" + encodeURIComponent(order.id); }
+      else{ // 正式环境：等待微信回调，轮询状态
+        b.textContent = "等待支付结果…";
+        var n = 0, timer = setInterval(function(){
+          YC.getOrder(order.id).then(function(o3){
+            if(o3 && o3.status === "paid"){ clearInterval(timer); location.href = "report.html?oid=" + encodeURIComponent(order.id); }
+            else if(++n > 30){ clearInterval(timer); b.disabled = false; b.textContent = "重新发起支付"; }
+          });
+        }, 2000);
+      }
+    }).catch(function(e){
+      document.getElementById("payErr").textContent = e.message;
+      b.disabled = false; b.textContent = "重新发起支付";
     });
   };
-}
+});
+})();
 </script>
 
 </body>
