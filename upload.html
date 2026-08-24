@@ -48,16 +48,17 @@
         <div class="drop" id="drop">
           <div class="big">⌂</div>
           点击选择户型图图片（JPG/PNG）<br>
-          <span style="font-size:12px;opacity:.75">内测阶段图片仅保存在本机浏览器，不会上传服务器</span>
+          <span style="font-size:12px;opacity:.75">图片仅用于 AI 识别与本机展示，服务器不保存原图</span>
           <img id="preview" style="display:none" alt="户型图预览">
         </div>
         <input type="file" id="file" accept="image/*" style="display:none">
+        <div id="ocrBox" style="display:none;margin-top:10px;font-size:12.5px"></div>
       </div>
 
       <div class="field">
         <label class="req"><b>入户门方位</b>（站在户型图前，按上北下南选门所在方位）</label>
         <div class="gong-grid" id="gongGrid"></div>
-        <div class="hint">八宅以门为伏位起大游年——门的位置是全部判定的起点，请务必按户型图方向选择。拿不准可在备注说明，报告解读时由风水师复核。</div>
+        <div class="hint" id="doorHint">八宅以门为伏位起大游年——门的位置是全部判定的起点，请务必按户型图方向选择。拿不准可在备注说明，报告解读时由风水师复核。</div>
       </div>
 
       <div class="row2">
@@ -113,7 +114,7 @@
     </div>
     <div class="card">
       <h3 style="font-size:16px;margin-bottom:12px"><span class="seal">密</span>隐私说明</h3>
-      <p style="font-size:13px;color:var(--sub)">内测阶段，户型图与填写信息仅保存在你自己的浏览器本地，用于生成报告与订单记录；正式上线后将加密传输并仅用于分析服务，可随时在订单中删除。</p>
+      <p style="font-size:13px;color:var(--sub)">户型图仅用于 AI 识别（加密传输，服务器不保存原图）；识别结果与填写信息用于生成报告和订单记录，可随时在订单中删除。</p>
     </div>
   </div>
 </div>
@@ -138,23 +139,50 @@ if(!YC.user()){ YC.requireAuth(function(){ location.reload(); }); }
 /* 宫位选择：上北下南布局 */
 var GONGS=[["乾","西北"],["坎","正北"],["艮","东北"],["兑","正西"],null,["震","正东"],["坤","西南"],["离","正南"],["巽","东南"]];
 var selDoor="";
+var cells={};
 var grid=document.getElementById("gongGrid");
+function pickDoor(g, silent){
+  if(!cells[g]) return;
+  selDoor=g;
+  grid.querySelectorAll(".gong-cell").forEach(function(c){c.classList.remove("sel");});
+  cells[g].classList.add("sel");
+}
 GONGS.forEach(function(g){
   var d=document.createElement("div");
   if(!g){ d.className="gong-cell center"; d.innerHTML="<b>中</b>宅心"; }
   else{
     d.className="gong-cell"; d.innerHTML="<b>"+g[0]+"</b>"+g[1];
-    d.onclick=function(){
-      selDoor=g[0];
-      grid.querySelectorAll(".gong-cell").forEach(function(c){c.classList.remove("sel");});
-      d.classList.add("sel");
-    };
+    cells[g[0]]=d;
+    d.onclick=function(){ pickDoor(g[0]); };
   }
   grid.appendChild(d);
 });
 
-/* 图片：本地预览 + 压缩（localStorage 容量保护） */
-var imgData=null;
+/* 图片：本地预览 + 压缩（localStorage 容量保护）；远程模式下自动跑 AI 识别 */
+var imgData=null, ocrResult=null;
+var ocrBox=document.getElementById("ocrBox");
+function escH(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function runOcr(){
+  ocrResult=null;
+  if(!YC.remote() || !imgData){ ocrBox.style.display="none"; return; }
+  ocrBox.style.display="block";
+  ocrBox.innerHTML='<span style="color:var(--sub)">⏳ AI 正在识别户型图（约 10 秒）…</span>';
+  YC.ocrFloorplan(imgData).then(function(d){
+    if(!d){ ocrBox.style.display="none"; return; } // 静默降级：识别不可用就手动填
+    ocrResult=d;
+    var chips=d.rooms.map(function(r){
+      return '<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 9px;border:1px solid var(--line);border-radius:99px;font-size:12px;color:var(--gold2)">'+escH(r.name)+'</span>';
+    }).join("");
+    var g=YC.doorHintGong(d.door_hint);
+    var doorMsg = g
+      ? ' · 门方位初判 <b style="color:var(--gold2)">'+g+'（'+({ "乾":"西北","坎":"正北","艮":"东北","兑":"正西","震":"正东","坤":"西南","离":"正南","巽":"东南" })[g]+'）</b>，已为你预选，可点击修改'
+      : ' · 门方位未能确定，请手动选择';
+    ocrBox.innerHTML='<div style="color:var(--good)">✓ 识别到 '+d.rooms.length+' 个空间'+doorMsg+'</div><div style="margin-top:6px">'+chips+'</div>';
+    if(g) pickDoor(g);
+  }).catch(function(){
+    ocrBox.style.display="none"; // 识别失败不阻塞流程
+  });
+}
 var drop=document.getElementById("drop"), file=document.getElementById("file"), preview=document.getElementById("preview");
 drop.onclick=function(){ file.click(); };
 file.onchange=function(){
@@ -169,6 +197,7 @@ file.onchange=function(){
       cv.getContext("2d").drawImage(im,0,0,w,h);
       imgData=cv.toDataURL("image/jpeg",0.72);
       preview.src=imgData; preview.style.display="block";
+      runOcr();
     };
     im.src=rd.result;
   };
@@ -190,7 +219,8 @@ document.getElementById("upForm").onsubmit=function(e){
     facing: document.getElementById("fFacing").value,
     birthYear: (yr&&yr>=1920&&yr<=2025)?yr:null,
     gender: document.getElementById("fGender").value,
-    note: document.getElementById("fNote").value.trim()
+    note: document.getElementById("fNote").value.trim(),
+    ocr: ocrResult
   };
   YC.createOrder(draft).then(function(o){ location.href="pay.html?oid="+encodeURIComponent(o.id); });
 };

@@ -22,6 +22,90 @@ function remote(){ return !!apiBase(); }
 function saveImg(oid, dataUrl){ var m = lsGet(LS_IMG, {}); m[oid] = dataUrl; if(!lsSet(LS_IMG, m)){ delete m[oid]; } }
 function getImg(oid){ return lsGet(LS_IMG, {})[oid] || null; }
 
+/* ---------- 户型图 OCR（远程模式调用服务端 /api/ocr/floorplan，阿里百炼 qwen-vl） ----------
+ * 原图只用于识别与本地展示，服务器不保存；识别结果（房间框 + 门方位提示）随订单 plan 保存。 */
+function dataUrlToBlob(dataUrl){
+  var m = /^data:([^;]+);base64,(.*)$/.exec(dataUrl || "");
+  if(!m) return null;
+  var bin = atob(m[2]), buf = new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) buf[i] = bin.charCodeAt(i);
+  return new Blob([buf], { type: m[1] });
+}
+function ocrFloorplan(dataUrl){
+  if(!remote()) return Promise.resolve(null);
+  var blob = dataUrlToBlob(dataUrl);
+  if(!blob) return Promise.resolve(null);
+  var fd = new FormData();
+  fd.append("file", blob, "floorplan.jpg");
+  var headers = {}, t = lsGet(LS_TOKEN, null);
+  if(t) headers.Authorization = "Bearer " + t;
+  return fetch(apiBase() + "/api/ocr/floorplan", { method: "POST", headers: headers, body: fd })
+    .then(function(r){
+      if(!r.ok) return r.json().catch(function(){ return {}; }).then(function(b){ throw new Error(b.detail || ("HTTP " + r.status)); });
+      return r.json();
+    })
+    .then(function(d){
+      if(!d || d.status !== "ok" || !d.rooms || !d.rooms.length) return null;
+      return { rooms: d.rooms, door_hint: d.door_hint || "unknown", confidence: d.confidence || 0 };
+    });
+}
+/* door_hint（n/ne/e/se/s/sw/w/nw）→ 宫位 */
+var DOOR_HINT_GONG = { n:"坎", ne:"艮", e:"震", se:"巽", s:"离", sw:"坤", w:"兑", nw:"乾" };
+function doorHintGong(hint){ return DOOR_HINT_GONG[hint] || null; }
+/* 房间落宫：以全部房间框的外接矩形为户型范围，按上北下南切 3×3 九宫 */
+var GRID3 = [["乾","坎","艮"],["兑",null,"震"],["坤","离","巽"]];
+function houseBoxOf(rooms){
+  var x1=1000, y1=1000, x2=0, y2=0, n=0;
+  (rooms||[]).forEach(function(r){
+    if(!r.box) return; n++;
+    x1=Math.min(x1,r.box[0]); y1=Math.min(y1,r.box[1]);
+    x2=Math.max(x2,r.box[2]); y2=Math.max(y2,r.box[3]);
+  });
+  return n ? [x1,y1,x2,y2] : null;
+}
+function roomGong(box, houseBox){
+  if(!box || !houseBox) return null;
+  var w = houseBox[2]-houseBox[0], h = houseBox[3]-houseBox[1];
+  if(w <= 0 || h <= 0) return null;
+  var col = Math.min(2, Math.max(0, Math.floor(((box[0]+box[2])/2 - houseBox[0]) / w * 3)));
+  var row = Math.min(2, Math.max(0, Math.floor(((box[1]+box[3])/2 - houseBox[1]) / h * 3)));
+  return GRID3[row][col];
+}
+/* 在户型图上叠加房间落宫层。byGong: {宫: palace对象}；container 需为空元素。 */
+function renderOcrOverlay(container, imgUrl, ocr, byGong){
+  if(typeof document === "undefined" || !container) return false;
+  var house = houseBoxOf(ocr && ocr.rooms);
+  if(!house) return false;
+  container.innerHTML = "";
+  container.style.position = "relative";
+  var img = document.createElement("img");
+  img.src = imgUrl; img.alt = "户型图（AI 识别叠加）";
+  img.style.cssText = "display:block;width:100%;border-radius:12px";
+  container.appendChild(img);
+  var layer = document.createElement("div");
+  layer.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none";
+  container.appendChild(layer);
+  ocr.rooms.forEach(function(room){
+    if(!room.box || /入户门/.test(room.name || "")) return; // 入户门是标记不是房间，不参与落宫
+    var g = roomGong(room.box, house);
+    var j = (g && byGong) ? byGong[g] : null;
+    var good = j && (j.base === "大吉" || j.base.indexOf("中吉") === 0);
+    var color = !j ? "160,160,160" : good ? "92,185,138" : (j.base === "大凶" ? "224,122,100" : "230,200,134");
+    var d = document.createElement("div");
+    d.style.cssText = "position:absolute;box-sizing:border-box;border:1.5px solid rgba("+color+",.95);"+
+      "background:rgba("+color+",.16);border-radius:6px;"+
+      "left:"+(room.box[0]/10)+"%;top:"+(room.box[1]/10)+"%;"+
+      "width:"+((room.box[2]-room.box[0])/10)+"%;height:"+((room.box[3]-room.box[1])/10)+"%";
+    var tag = document.createElement("span");
+    tag.style.cssText = "position:absolute;left:2px;top:2px;font-size:11px;line-height:1.35;padding:1px 6px;"+
+      "border-radius:6px;background:rgba(14,17,22,.78);color:#ece6d6;white-space:nowrap";
+    tag.textContent = room.name + (j ? " · " + g + "宫·" + j.star : (g ? " · " + g + "宫" : ""));
+    d.appendChild(tag);
+    layer.appendChild(d);
+  });
+  return true;
+}
+
 /* ---------- 会话 ---------- */
 function user(){ return lsGet(LS_USER, null); }
 function setSession(u, token){ lsSet(LS_USER, u); if(token) lsSet(LS_TOKEN, token); }
@@ -100,6 +184,7 @@ function createOrder(draft){
   }
   var plan = { name: draft.name, area: draft.area, door: draft.door, facing: draft.facing,
                birthYear: draft.birthYear, gender: draft.gender, note: draft.note };
+  if(draft.ocr) plan.ocr = draft.ocr;
   return api("/api/orders", { method: "POST", body: JSON.stringify({ plan: plan }) })
     .then(function(o){ if(draft.img) saveImg(o.id, draft.img); return normOrder(o); });
 }
@@ -290,6 +375,7 @@ root.YC = { PRICE: PRICE, PRICE_OLD: PRICE_OLD, TITLE: TITLE,
   getReport: getReport, localReport: localReport, yiji: yiji, serverHealth: serverHealth,
   openLoginModal: openLoginModal, closeLoginModal: closeLoginModal, requireAuth: requireAuth,
   renderNav: renderNav, devBootstrap: devBootstrap, fmtTime: fmtTime, isMobile: isMobile,
-  pseudoQR: pseudoQR, remote: remote, saveImg: saveImg, getImg: getImg };
+  pseudoQR: pseudoQR, remote: remote, saveImg: saveImg, getImg: getImg,
+  ocrFloorplan: ocrFloorplan, doorHintGong: doorHintGong, roomGong: roomGong,
+  houseBoxOf: houseBoxOf, renderOcrOverlay: renderOcrOverlay };
 })(typeof window !== "undefined" ? window : globalThis);
-

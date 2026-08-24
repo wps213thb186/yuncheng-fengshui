@@ -89,6 +89,8 @@ function render(order, r){
   var p = order.plan || {};
   document.getElementById("rMeta").textContent =
     "订单 " + order.id + " · " + (p.name || "未命名房源") + " · 生成于 " + YC.fmtTime(order.paidAt || order.createdAt);
+  var byGong = {};
+  r.palaces.forEach(function(j){ byGong[j.gong] = j; });
 
   /* ---- 宅况总览 ---- */
   var ov = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:14px"><span class="seal">宅</span>宅况总览</h3><dl class="kv">'+
@@ -101,17 +103,20 @@ function render(order, r){
     ov += '<dt>命卦匹配</dt><dd>'+p.birthYear+' 年'+(p.gender||"男")+'命 · '+mg.gua+'卦（'+mg.group+'）——<b style="color:'+(mg.match?"var(--good)":"var(--bad)")+'">'+(mg.match?"与本宅相配":"与本宅不相配，可参考下方改门对比")+'</b><br><span class="dim" style="color:var(--sub);font-size:12px">通行命卦原则（非本书明文）；传统以立春为年界，此处按公历年简化</span></dd>';
   }
   ov += '<dt>引擎校验</dt><dd class="dim">八宅判定引擎回归对账 <b style="color:var(--good)">'+(r.engine_check.pass ? (r.engine_check.total+"/"+r.engine_check.total+" 通过") : "异常")+'</b>'+(YC.remote()?"（服务端引擎）":"（本地引擎）")+'</dd></dl>';
-  if(p.img) ov += '<div style="margin-top:16px"><div style="font-size:12.5px;color:var(--sub);margin-bottom:8px">已上传户型图</div><img src="'+p.img+'" style="max-width:100%;border-radius:12px;border:1px solid var(--line-soft)" alt="户型图"></div>';
+  var hasOverlay = p.img && p.ocr && p.ocr.rooms && p.ocr.rooms.length;
+  if(p.img) ov += '<div style="margin-top:16px"><div style="font-size:12.5px;color:var(--sub);margin-bottom:8px">'+
+    (hasOverlay ? '已上传户型图 · AI 识别落宫（房间框颜色 = 所在宫吉凶，按上北下南估算）' : '已上传户型图')+'</div>'+
+    (hasOverlay ? '<div id="planOverlay" style="border-radius:12px;overflow:hidden;border:1px solid var(--line-soft)"></div>'
+                : '<img src="'+p.img+'" style="max-width:100%;border-radius:12px;border:1px solid var(--line-soft)" alt="户型图">')+'</div>';
+  if(hasOverlay) ov += '<div class="hint" style="margin-top:8px">绿色 = 吉宫 · 金色 = 中吉/次凶 · 红色 = 大凶宫；落宫为 AI 按图面比例估算，师傅解读时会复核校准。</div>';
   if(p.imgDropped) ov += '<div class="hint" style="margin-top:10px">（图片超出本地存储容量，未保存；不影响判定）</div>';
   if(p.note) ov += '<dl class="kv" style="margin-top:10px"><dt>备注</dt><dd class="dim">'+esc(p.note)+'</dd></dl>';
   ov += '</div>';
 
   /* ---- 八宫星布（上北下南） ---- */
-  var byGong = {};
-  r.palaces.forEach(function(j){ byGong[j.gong] = j; });
   var LAYOUT = ["乾","坎","艮","兑",null,"震","坤","离","巽"];
   var grid = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">宫</span>八宫星布</h3>'+
-    '<p style="font-size:12.5px;color:var(--sub);margin-bottom:16px">按上北下南布宫；金框为入户门（伏位）。房间级落宫判定将在「图片识别 + 九宫校准」上线后自动叠加到您的户型图上。</p><div class="palace-grid">';
+    '<p style="font-size:12.5px;color:var(--sub);margin-bottom:16px">按上北下南布宫；金框为入户门（伏位）。'+(hasOverlay?'房间落宫已叠加在上方户型图。':'上传户型图后，房间级落宫将自动叠加显示。')+'</p><div class="palace-grid">';
   LAYOUT.forEach(function(g){
     if(!g){ grid += '<div class="palace center"><div class="p-dir">中宫</div><div class="p-star">宅心</div><div class="p-ming">气之枢纽</div></div>'; return; }
     var j = byGong[g];
@@ -168,13 +173,18 @@ function render(order, r){
     '<a class="btn btn-ghost" href="#" onclick="alert(\'内测阶段：预约功能接入中\');return false;">预约上门勘宅</a>'+
     '</div></div>';
 
-  var note = '<div class="foot-note">溯源：大游年歌（卷一p57-58）· 相宅宗旨（p1）· 星宫生克吉凶论（p85-87）· 八星吉凶总要（p63）· 九星年限应验歌（p88-90）；气法四态为师承规则（老唐版），单独分级。本报告为门位级八宅判定；房间级落宫、窝气/死气/背气诊断将在「图片识别 + 九宫校准」上线后补入本报告（已购订单自动升级）。报告内容属传统居住文化参考信息，不构成购房、居住或投资决策建议。</div>';
+  var note = '<div class="foot-note">溯源：大游年歌（卷一p57-58）· 相宅宗旨（p1）· 星宫生克吉凶论（p85-87）· 八星吉凶总要（p63）· 九星年限应验歌（p88-90）；气法四态为师承规则（老唐版），单独分级。本报告为门位级八宅判定'+(hasOverlay?'，房间落宫由 AI 识别户型图并按上北下南估算':'；上传户型图可自动叠加房间级落宫')+'；窝气/死气/背气诊断将在后续版本补入本报告（已购订单自动升级）。报告内容属传统居住文化参考信息，不构成购房、居住或投资决策建议。</div>';
 
   main.innerHTML = ov + grid + list + tbl + hj + cta + note;
+  if(hasOverlay){
+    var box = document.getElementById("planOverlay");
+    if(box && !YC.renderOcrOverlay(box, p.img, p.ocr, byGong)){
+      box.outerHTML = '<img src="'+p.img+'" style="max-width:100%;border-radius:12px" alt="户型图">';
+    }
+  }
 }
 })();
 </script>
 
 </body>
 </html>
-
