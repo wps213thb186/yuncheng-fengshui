@@ -2,6 +2,6 @@
  * YC_API_BASE 留空 = 纯前端内测模式（数据存本机 localStorage）；
  * 填后端地址（如 https://your-fc.example.com）即切换为真实 API 模式。
  * 本地联调：http://127.0.0.1:8787
+ * 生产：阿里云 FC 香港（2026-08-24 上线）
  */
-window.YC_API_BASE = "";
-
+window.YC_API_BASE = "https://yuncheng-api-tzdtowxgnd.cn-hongkong.fcapp.run";
