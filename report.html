@@ -169,8 +169,8 @@ function render(order, r){
     '<h3 style="font-size:18px;margin-bottom:8px">报告看不懂？让师傅帮你拆</h3>'+
     '<p style="font-size:13px;color:var(--sub);max-width:460px;margin:0 auto 20px">企业微信一对一解读本份报告、多户型对比筛选，或预约线下上门勘宅复核。</p>'+
     '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">'+
-    '<a class="btn btn-gold" href="#" onclick="alert(\'内测阶段：企业微信渠道接入中，请暂通过内测群联系师傅\');return false;">企业微信解读<span class="mock-tag">接入中</span></a>'+
-    '<a class="btn btn-ghost" href="#" onclick="alert(\'内测阶段：预约功能接入中\');return false;">预约上门勘宅</a>'+
+    '<a class="btn btn-gold" href="'+(window.YC_CS_URL||'#')+'" target="_blank" rel="noopener">企业微信解读</a>'+
+    '<a class="btn btn-ghost" href="'+(window.YC_CS_URL||'#')+'" target="_blank" rel="noopener">预约上门勘宅</a>'+
     '</div></div>';
 
   var note = '<div class="foot-note">溯源：大游年歌（卷一p57-58）· 相宅宗旨（p1）· 星宫生克吉凶论（p85-87）· 八星吉凶总要（p63）· 九星年限应验歌（p88-90）；气法四态为师承规则（老唐版），单独分级。本报告为门位级八宅判定'+(hasOverlay?'，房间落宫由 AI 识别户型图并按上北下南估算':'；上传户型图可自动叠加房间级落宫')+'；窝气/死气/背气诊断将在后续版本补入本报告（已购订单自动升级）。报告内容属传统居住文化参考信息，不构成购房、居住或投资决策建议。</div>';

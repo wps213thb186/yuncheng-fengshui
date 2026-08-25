@@ -5,3 +5,5 @@
  * 生产：阿里云 FC 香港（2026-08-24 上线）
  */
 window.YC_API_BASE = "https://yuncheng-api-tzdtowxgnd.cn-hongkong.fcapp.run";
+/* 企业微信·微信客服链接：手机端点击直接拉起客服对话，PC 端打开显示扫码 */
+window.YC_CS_URL = "https://work.weixin.qq.com/kfid/kfcba0c3f261f358396";
