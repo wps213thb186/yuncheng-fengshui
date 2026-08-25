@@ -218,6 +218,26 @@ function payOrder(id, scene){
         .catch(function(){ return getOrder(id); }); // 正式环境：等回调，前端轮询
     });
 }
+/* 发起支付并返回服务端原始应答（含 code_url / pay_params），由页面自行渲染与轮询 */
+function createPrepay(id, scene){
+  if(!remote()){
+    return updateOrder(id, { status: "paid", paidAt: Date.now(), reportReady: true })
+      .then(function(){ return { status: "paid" }; });
+  }
+  return api("/api/pay/wechat", { method: "POST", body: JSON.stringify({ order_id: id, scene: scene || "native" }) });
+}
+/* 用 qrcode-generator 把文本渲染为 canvas 上的真实二维码（微信支付 code_url 等） */
+function drawQR(canvas, text){
+  if(typeof qrcode === "undefined") return false;
+  var qr = qrcode(0, "M"); qr.addData(text); qr.make();
+  var n = qr.getModuleCount(), tile = Math.floor(canvas.width / (n + 8)), pad = Math.floor((canvas.width - tile * n) / 2);
+  var ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#f4f1e8"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#1a1610";
+  for(var r = 0; r < n; r++) for(var c = 0; c < n; c++)
+    if(qr.isDark(r, c)) ctx.fillRect(pad + c * tile, pad + r * tile, tile, tile);
+  return true;
+}
 
 /* ---------- 报告数据（统一形态；远程调引擎 API，本地用 JS 引擎） ---------- */
 function getReport(plan){
@@ -372,6 +392,7 @@ root.YC = { PRICE: PRICE, PRICE_OLD: PRICE_OLD, TITLE: TITLE,
   user: user, logout: logout, loginMobile: loginMobile, loginWechatMock: loginWechatMock,
   loginQRStart: loginQRStart, loginQRPoll: loginQRPoll, loginQRMockConfirm: loginQRMockConfirm,
   listOrders: listOrders, getOrder: getOrder, createOrder: createOrder, updateOrder: updateOrder, payOrder: payOrder,
+  createPrepay: createPrepay, drawQR: drawQR,
   getReport: getReport, localReport: localReport, yiji: yiji, serverHealth: serverHealth,
   openLoginModal: openLoginModal, closeLoginModal: closeLoginModal, requireAuth: requireAuth,
   renderNav: renderNav, devBootstrap: devBootstrap, fmtTime: fmtTime, isMobile: isMobile,

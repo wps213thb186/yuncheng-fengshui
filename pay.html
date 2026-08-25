@@ -44,12 +44,13 @@
 <footer>
   <div class="wrap">
     <div class="foot-brand">运 乘 风 水</div>
-    <p>支付服务由微信支付提供（内测阶段为模拟支付，不发生真实扣款）。</p>
+    <p>支付服务由微信支付提供；虚拟内容服务，报告生成即交付，支付成功后不支持退款。</p>
     <p style="opacity:.6;margin-top:8px">© 2026 运乘风水 · 内测期间功能陆续开放</p>
   </div>
 </footer>
 
 <script src="assets/js/config.js"></script>
+<script src="assets/js/qrcode.min.js"></script>
 <script src="assets/js/store.js"></script>
 <script>
 (function(){ "use strict";
@@ -73,7 +74,23 @@ Promise.resolve(YC.getOrder(oid)).then(function(order){
     return;
   }
   if(order.status === "paid"){ location.replace("report.html?oid=" + encodeURIComponent(order.id)); return; }
+  YC.serverHealth().then(function(h){
+    render(order, !h || h.pay_mock !== false); // 拿不到健康信息时按 mock 处理，避免误导真实扣款
+  });
+});
+
+function render(order, payMock){
   var mobile = YC.isMobile();
+  var payCard =
+    '<div class="card" style="text-align:center">'+
+      '<h3 style="font-size:16px;margin-bottom:4px">微信支付'+(payMock?'<span class="mock-tag">内测模拟</span>':'')+'</h3>'+
+      '<div id="payArea"></div>'+
+      '<div class="hint" style="margin-top:14px">'+(payMock
+        ? '内测阶段不发生真实扣款；支付成功后将自动生成分析报告'
+        : '虚拟内容服务，报告生成即交付，<b>支付成功后不支持退款</b>；识别明显错误可免费重做一次')+'</div>'+
+      '<div id="payErr" style="color:var(--bad);font-size:12.5px;margin-top:8px"></div>'+
+      '<div style="margin-top:14px"><a href="orders.html" style="font-size:12.5px;color:var(--sub)">暂不支付，去订单中心</a></div>'+
+    '</div>';
   main.innerHTML =
   '<div class="two-col">'+
     '<div class="card">'+
@@ -89,44 +106,61 @@ Promise.resolve(YC.getOrder(oid)).then(function(order){
         '<span class="price-old">原价 ¥'+order.amountOld+'</span>'+
         '<span class="badge b-gold">早鸟价</span>'+
       '</div>'+
-    '</div>'+
-    '<div class="card" style="text-align:center">'+
-      '<h3 style="font-size:16px;margin-bottom:4px">微信支付<span class="mock-tag">内测模拟</span></h3>'+
-      (mobile
-        ? '<p class="m-sub" style="color:var(--sub);font-size:12.5px;margin:10px 0 18px">确认订单信息无误后，点击按钮调起微信支付</p>'+
-          '<button class="btn btn-wechat btn-block" id="payBtn">微信支付 ¥'+order.amount.toFixed(1)+'（模拟）</button>'
-        : '<p class="m-sub" style="color:var(--sub);font-size:12.5px;margin:10px 0 4px">请使用微信扫码完成支付</p>'+
-          '<div class="qr"><canvas id="payQR" width="200" height="200"></canvas></div>'+
-          '<div style="margin-top:14px"><button class="btn btn-gold" id="payBtn">模拟：支付成功</button></div>')+
-      '<div class="hint" style="margin-top:16px">内测阶段不发生真实扣款；支付成功后将自动生成分析报告</div>'+
-      '<div id="payErr" style="color:var(--bad);font-size:12.5px;margin-top:8px"></div>'+
-      '<div style="margin-top:14px"><a href="orders.html" style="font-size:12.5px;color:var(--sub)">暂不支付，去订单中心</a></div>'+
-    '</div>'+
+    '</div>'+ payCard +
   '</div>';
-  var c = document.getElementById("payQR");
-  if(c) YC.pseudoQR(c, "pay:" + order.id);
-  document.getElementById("payBtn").onclick = function(){
-    var b = this; b.disabled = true; b.textContent = "支付确认中…";
-    YC.payOrder(order.id, mobile ? "jsapi" : "native").then(function(o2){
-      if(o2 && o2.status === "paid"){ location.href = "report.html?oid=" + encodeURIComponent(order.id); }
-      else{ // 正式环境：等待微信回调，轮询状态
-        b.textContent = "等待支付结果…";
-        var n = 0, timer = setInterval(function(){
-          YC.getOrder(order.id).then(function(o3){
-            if(o3 && o3.status === "paid"){ clearInterval(timer); location.href = "report.html?oid=" + encodeURIComponent(order.id); }
-            else if(++n > 30){ clearInterval(timer); b.disabled = false; b.textContent = "重新发起支付"; }
-          });
-        }, 2000);
-      }
-    }).catch(function(e){
-      document.getElementById("payErr").textContent = e.message;
-      b.disabled = false; b.textContent = "重新发起支付";
-    });
-  };
-});
+  var area = document.getElementById("payArea");
+  var err = document.getElementById("payErr");
+  var go = "report.html?oid=" + encodeURIComponent(order.id);
+
+  if(payMock){ /* 内测模拟：假码 + 一键支付成功 */
+    area.innerHTML =
+      '<p class="m-sub" style="color:var(--sub);font-size:12.5px;margin:10px 0 4px">'+(mobile?"点击按钮完成模拟支付":"请使用微信扫码完成支付")+'</p>'+
+      (mobile?'':'<div class="qr"><canvas id="payQR" width="200" height="200"></canvas></div>')+
+      '<div style="margin-top:14px"><button class="btn btn-gold" id="payBtn">模拟：支付成功</button></div>';
+    var c = document.getElementById("payQR");
+    if(c) YC.pseudoQR(c, "pay:" + order.id);
+    document.getElementById("payBtn").onclick = function(){
+      var b=this; b.disabled=true; b.textContent="支付确认中…";
+      YC.payOrder(order.id, mobile?"jsapi":"native").then(function(o2){
+        if(o2 && o2.status==="paid") location.href = go;
+        else { b.disabled=false; b.textContent="模拟：支付成功"; }
+      }).catch(function(e){ err.textContent=e.message; b.disabled=false; b.textContent="模拟：支付成功"; });
+    };
+    return;
+  }
+
+  /* 真实支付：自动下单出码（PC 扫码；手机浏览器提示截图后用微信识别） */
+  area.innerHTML = '<p class="m-sub" style="color:var(--sub);font-size:12.5px;margin:10px 0">正在向微信支付下单…</p>';
+  var scene = mobile ? "jsapi" : "native";
+  YC.createPrepay(order.id, scene).catch(function(e){
+    if(mobile) return YC.createPrepay(order.id, "native"); // JSAPI 未开通时回退扫码
+    throw e;
+  }).then(function(p){
+    if(!p) return;
+    if(p.status === "paid"){ location.href = go; return; }
+    if(!p.code_url){ err.textContent = "下单应答异常，请重试"; return; }
+    area.innerHTML =
+      '<p class="m-sub" style="color:var(--sub);font-size:12.5px;margin:10px 0 4px">'+
+        (mobile ? '截图下方二维码 → 打开微信「扫一扫」→ 右上角相册选截图，完成支付'
+                : '请使用微信「扫一扫」完成支付')+'</p>'+
+      '<div class="qr"><canvas id="payQR" width="220" height="220"></canvas></div>'+
+      '<div class="hint" style="margin-top:10px;color:var(--gold2)">等待支付结果，支付成功将自动跳转报告…</div>';
+    var c = document.getElementById("payQR");
+    if(!YC.drawQR(c, p.code_url)){ err.textContent = "二维码渲染失败，请刷新重试"; return; }
+    var n = 0;
+    var timer = setInterval(function(){
+      YC.getOrder(order.id).then(function(o3){
+        if(o3 && o3.status === "paid"){ clearInterval(timer); location.href = go; }
+        else if(++n > 150){ clearInterval(timer); err.textContent = "等待超时，请刷新页面重试"; }
+      }).catch(function(){});
+    }, 2000);
+  }).catch(function(e){
+    err.textContent = e.message;
+    area.innerHTML = '<div style="margin-top:10px"><button class="btn btn-gold" onclick="location.reload()">重新发起支付</button></div>';
+  });
+}
 })();
 </script>
 
 </body>
 </html>
-
