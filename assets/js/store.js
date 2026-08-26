@@ -229,6 +229,10 @@ function createPrepay(id, scene){
   }
   return api("/api/pay/wechat", { method: "POST", body: JSON.stringify({ order_id: id, scene: scene || "native" }) });
 }
+/* 支付状态轮询：服务端在真实模式下会主动向微信查单兜底（回调未达也能翻转状态） */
+function payStatus(id){
+  return api("/api/pay/status?order_id=" + encodeURIComponent(id));
+}
 /* 用 qrcode-generator 把文本渲染为 canvas 上的真实二维码（微信支付 code_url 等） */
 function drawQR(canvas, text){
   if(typeof qrcode === "undefined") return false;
@@ -426,6 +430,7 @@ root.YC = { PRICE: PRICE, PRICE_OLD: PRICE_OLD, TITLE: TITLE,
   loginQRStart: loginQRStart, loginQRPoll: loginQRPoll, loginQRMockConfirm: loginQRMockConfirm,
   listOrders: listOrders, getOrder: getOrder, createOrder: createOrder, updateOrder: updateOrder, payOrder: payOrder,
   createPrepay: createPrepay, drawQR: drawQR,
+  payStatus: payStatus,
   getReport: getReport, localReport: localReport, yiji: yiji, serverHealth: serverHealth,
   authMe: authMe, isAuthError: isAuthError,
   openLoginModal: openLoginModal, closeLoginModal: closeLoginModal, requireAuth: requireAuth,

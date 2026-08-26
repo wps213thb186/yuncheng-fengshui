@@ -145,8 +145,8 @@ function render(order, payMock){
   function pollPaid(){
     var n = 0;
     var timer = setInterval(function(){
-      YC.getOrder(order.id).then(function(o3){
-        if(o3 && o3.status === "paid"){ clearInterval(timer); location.href = go; }
+      YC.payStatus(order.id).then(function(s){
+        if(s && s.status === "paid"){ clearInterval(timer); location.href = go; }
         else if(++n > 150){ clearInterval(timer); err.textContent = "等待超时，请刷新页面重试"; }
       }).catch(function(){});
     }, 2000);
