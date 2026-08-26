@@ -254,6 +254,11 @@ function getReport(plan){
   }
   return Promise.resolve(localReport(plan.door, plan.birthYear, plan.gender));
 }
+/* 已购订单的付费报告：服务端返回支付时保存的不可变快照（含版本与 SHA-256 校验值）。
+   快照不可用时回退到实时计算，保证内测期间可读。 */
+function getOrderReport(id){
+  return api("/api/orders/" + encodeURIComponent(id) + "/report");
+}
 function yiji(base){
   return (base === "大吉" || base.indexOf("中吉") === 0)
     ? "吉位宜动宜通：宜高大明亮、宜开门窗、可作卧室或常活动区（八星吉凶总要：临宫得位福禄增）"
@@ -432,6 +437,7 @@ root.YC = { PRICE: PRICE, PRICE_OLD: PRICE_OLD, TITLE: TITLE,
   createPrepay: createPrepay, drawQR: drawQR,
   payStatus: payStatus,
   getReport: getReport, localReport: localReport, yiji: yiji, serverHealth: serverHealth,
+  getOrderReport: getOrderReport,
   authMe: authMe, isAuthError: isAuthError,
   openLoginModal: openLoginModal, closeLoginModal: closeLoginModal, requireAuth: requireAuth,
   renderNav: renderNav, devBootstrap: devBootstrap, fmtTime: fmtTime, isMobile: isMobile,

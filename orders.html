@@ -30,7 +30,7 @@
 <div class="wrap page-head">
   <div class="eyebrow">ORDERS · 订单中心</div>
   <h1>我的订单与报告</h1>
-  <p class="sub">全部订单与已生成的报告都保存在这里，报告永久可回看。</p>
+  <p class="sub">全部订单与已生成的报告都保存在这里，已购报告以支付时快照保存，可随时回看。</p>
 </div>
 
 <div class="wrap page-body" id="main"></div>
@@ -84,7 +84,7 @@ Promise.resolve(YC.listOrders()).then(function(os){
       '</div></div>';
   });
   html += '</div><div class="hint" style="margin-top:14px">'+
-    (YC.remote() ? "订单保存在你的微信账号下，换设备登录也能看。" : "内测阶段订单保存在本机浏览器；正式上线后同步到微信账号，换设备也能看。")+'</div>';
+    (YC.remote() ? "订单保存在当前登录账号下；内测期间建议使用同一浏览器与登录方式访问。" : "内测阶段订单保存在本机浏览器；正式上线后同步到登录账号。")+'</div>';
   main.innerHTML = html;
 }).catch(function(e){
   main.innerHTML = '<div class="card empty"><div class="e-seal">错</div><p>订单加载失败：' + e.message + '</p></div>';
