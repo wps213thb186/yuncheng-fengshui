@@ -56,6 +56,8 @@
 (function(){ "use strict";
 YC.devBootstrap();
 YC.renderNav();
+/* 会话体检：token 失效时自动清理，避免拿旧会话查单 */
+if(YC.user() && YC.remote()){ YC.authMe().catch(function(){ YC.logout(); YC.renderNav(); }); }
 var main = document.getElementById("main");
 var oid = new URLSearchParams(location.search).get("oid") || "";
 
@@ -70,7 +72,13 @@ function planLine(p){
 
 Promise.resolve(YC.getOrder(oid)).then(function(order){
   if(!order){
-    main.innerHTML = '<div class="card empty"><div class="e-seal">空</div><p>没有找到这个订单，可能已过期。</p><div style="margin-top:18px"><a class="btn btn-gold" href="upload.html">重新上传户型图</a></div></div>';
+    var needLogin = !YC.user();
+    main.innerHTML = '<div class="card empty"><div class="e-seal">空</div><p>'+
+      (needLogin ? '请先登录后查看订单。' : '没有找到这个订单，可能已过期；若登录状态失效请重新登录后再试。')+
+      '</p><div style="margin-top:18px;display:flex;gap:10px;justify-content:center">'+
+      '<button class="btn btn-gold" id="reLogin">微信登录</button>'+
+      '<a class="btn" href="upload.html">重新上传户型图</a></div></div>';
+    document.getElementById("reLogin").onclick = function(){ YC.openLoginModal(function(){ location.reload(); }); };
     return;
   }
   if(order.status === "paid"){ location.replace("report.html?oid=" + encodeURIComponent(order.id)); return; }

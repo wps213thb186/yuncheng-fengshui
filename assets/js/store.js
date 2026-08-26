@@ -123,6 +123,9 @@ function api(path, opts){
   });
 }
 function serverHealth(){ return remote() ? api("/api/health") : Promise.resolve(null); }
+function authMe(){ return api("/api/auth/me"); }
+/* 401 类错误（未登录/登录已过期）判定：用于自动清理失效会话，避免本地显示已登录但服务端不认 */
+function isAuthError(e){ return !!(e && /未登录|登录已过期|401/.test((e && e.message) || "")); }
 
 /* ---------- 登录 ---------- */
 function loginWechatMock(){
@@ -326,7 +329,7 @@ function openLoginModal(onOk){
   document.getElementById("ycLoginClose").onclick = closeLoginModal;
   mask.onclick = function(e){ if(e.target === mask) closeLoginModal(); };
   var timer = null;
-  function done(){ if(timer) clearInterval(timer); closeLoginModal(); if(onOk) onOk(user()); }
+  function done(){ if(timer) clearInterval(timer); closeLoginModal(); renderNav(); if(onOk) onOk(user()); }
 
   if(mobile){
     btn.onclick = function(){
@@ -382,6 +385,7 @@ function renderNav(){
   if(typeof document === "undefined") return;
   initFromUrl();
   var nav = document.querySelector(".nav"); if(!nav) return;
+  nav.querySelectorAll(".keep, .nav-user").forEach(function(n){ n.remove(); }); // 幂等：登录态变化后可重复渲染
   var u = user();
   var html = u
     ? '<a class="keep" href="orders.html">我的订单</a><span class="nav-user">' + u.nick + '</span><a class="keep" id="ycLogout" href="#">退出</a>'
@@ -423,6 +427,7 @@ root.YC = { PRICE: PRICE, PRICE_OLD: PRICE_OLD, TITLE: TITLE,
   listOrders: listOrders, getOrder: getOrder, createOrder: createOrder, updateOrder: updateOrder, payOrder: payOrder,
   createPrepay: createPrepay, drawQR: drawQR,
   getReport: getReport, localReport: localReport, yiji: yiji, serverHealth: serverHealth,
+  authMe: authMe, isAuthError: isAuthError,
   openLoginModal: openLoginModal, closeLoginModal: closeLoginModal, requireAuth: requireAuth,
   renderNav: renderNav, devBootstrap: devBootstrap, fmtTime: fmtTime, isMobile: isMobile,
   pseudoQR: pseudoQR, remote: remote, saveImg: saveImg, getImg: getImg,

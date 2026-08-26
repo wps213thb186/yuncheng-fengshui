@@ -58,6 +58,8 @@
 (function(){ "use strict";
 YC.devBootstrap();
 YC.renderNav();
+/* 会话体检：token 失效时自动清理 */
+if(YC.user() && YC.remote()){ YC.authMe().catch(function(){ YC.logout(); YC.renderNav(); }); }
 var main = document.getElementById("main");
 
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }

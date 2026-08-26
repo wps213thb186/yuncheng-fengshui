@@ -51,6 +51,8 @@
 (function(){ "use strict";
 YC.devBootstrap();
 YC.renderNav();
+/* 会话体检：token 失效时自动清理 */
+if(YC.user() && YC.remote()){ YC.authMe().catch(function(){ YC.logout(); YC.renderNav(); location.reload(); }); }
 var main = document.getElementById("main");
 
 if(!YC.user()){
@@ -92,4 +94,3 @@ Promise.resolve(YC.listOrders()).then(function(os){
 
 </body>
 </html>
-

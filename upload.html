@@ -134,7 +134,9 @@
 <script>
 YC.devBootstrap();
 YC.renderNav();
-if(!YC.user()){ YC.requireAuth(function(){ location.reload(); }); }
+/* 会话体检：本地仍显示已登录但 token 已失效（如服务端重置/重新部署）时自动清理，避免提交时静默失败 */
+if(YC.user() && YC.remote()){ YC.authMe().catch(function(){ YC.logout(); YC.renderNav(); }); }
+if(!YC.user()){ YC.requireAuth(function(){}); }
 
 /* 宫位选择：上北下南布局 */
 var GONGS=[["乾","西北"],["坎","正北"],["艮","东北"],["兑","正西"],null,["震","正东"],["坤","西南"],["离","正南"],["巽","东南"]];
@@ -204,10 +206,9 @@ file.onchange=function(){
   rd.readAsDataURL(f);
 };
 
-document.getElementById("upForm").onsubmit=function(e){
-  e.preventDefault();
+var submitting=false;
+function doSubmit(){
   var err=document.getElementById("errBox");
-  if(!YC.user()){ YC.requireAuth(function(){ location.reload(); }); return; }
   if(!selDoor){ err.style.display="block"; err.textContent="请选择入户门方位（这是八宅判定的起点，必选）。"; return; }
   err.style.display="none";
   var yr=parseInt(document.getElementById("fYear").value)||null;
@@ -222,7 +223,28 @@ document.getElementById("upForm").onsubmit=function(e){
     note: document.getElementById("fNote").value.trim(),
     ocr: ocrResult
   };
-  YC.createOrder(draft).then(function(o){ location.href="pay.html?oid="+encodeURIComponent(o.id); });
+  var btn=document.querySelector("#upForm button[type=submit]");
+  submitting=true; if(btn){ btn.disabled=true; btn.textContent="正在创建订单…"; }
+  function restore(){ submitting=false; if(btn){ btn.disabled=false; btn.textContent="提交，去支付 ¥9.9"; } }
+  YC.createOrder(draft).then(function(o){
+    location.href="pay.html?oid="+encodeURIComponent(o.id);
+  }).catch(function(ex){
+    restore();
+    if(YC.isAuthError(ex)){
+      /* 会话失效：清理旧会话并重新登录，登录成功后自动继续提交（表单与图片不丢） */
+      YC.logout(); YC.renderNav();
+      err.style.display="block"; err.textContent="登录状态已失效，请重新登录后继续（已填写的信息会保留）。";
+      YC.openLoginModal(function(){ doSubmit(); });
+      return;
+    }
+    err.style.display="block"; err.textContent="订单创建失败："+ex.message+"，请重试。";
+  });
+}
+document.getElementById("upForm").onsubmit=function(e){
+  e.preventDefault();
+  if(submitting) return;
+  if(!YC.user()){ YC.requireAuth(function(){ doSubmit(); }); return; } // 登录成功后直接继续，不刷新页面、不丢已填信息
+  doSubmit();
 };
 </script>
 
