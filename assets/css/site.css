@@ -152,6 +152,8 @@ textarea.input{resize:vertical;min-height:76px}
 .gong-cell:not(.center):hover{border-color:var(--gold)}
 .gong-cell.sel{border-color:var(--gold);color:var(--gold2);background:rgba(201,163,92,.1)}
 .gong-cell.sel b{color:var(--gold2)}
+.gong-cell.ai{border:1.5px dashed var(--gold);color:var(--gold2)}
+.gong-cell.ai b{color:var(--gold2)}
 
 /* 上传 */
 .drop{border:1.5px dashed var(--line);border-radius:var(--radius);padding:26px 20px;text-align:center;color:var(--sub);cursor:pointer;transition:border-color .15s;font-size:13.5px}
@@ -229,4 +231,3 @@ textarea.input{resize:vertical;min-height:76px}
 /* 引文 */
 .quote{font-family:var(--kai);color:var(--gold2);font-size:15.5px;line-height:2.1;border-left:2px solid var(--gold);padding-left:18px;margin:6px 0}
 .foot-note{font-size:11.5px;color:var(--sub);line-height:1.9;border-top:1px dashed var(--line-soft);padding-top:16px;margin-top:28px}
-

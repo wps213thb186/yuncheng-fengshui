@@ -46,13 +46,32 @@ function ocrFloorplan(dataUrl){
     })
     .then(function(d){
       if(!d || d.status !== "ok" || !d.rooms || !d.rooms.length) return null;
-      return { rooms: d.rooms, door_hint: d.door_hint || "unknown", confidence: d.confidence || 0 };
+      return { rooms: d.rooms, door_hint: d.door_hint || "unknown",
+               north_dir: d.north_dir || "unknown", confidence: d.confidence || 0 };
     });
 }
 /* door_hint（n/ne/e/se/s/sw/w/nw）→ 宫位 */
 var DOOR_HINT_GONG = { n:"坎", ne:"艮", e:"震", se:"巽", s:"离", sw:"坤", w:"兑", nw:"乾" };
 function doorHintGong(hint){ return DOOR_HINT_GONG[hint] || null; }
-/* 房间落宫：以全部房间框的外接矩形为户型范围，按上北下南切 3×3 九宫 */
+/* 方向校准：OCR 输出 north_dir = 图片顶边朝向的真实方位（n/e/s/w 支持落宫校准；
+   其余值/unknown 视为方向未知，不输出确定房间落宫）。 */
+var NORTH_DIR_NAME = { n:"正北", e:"正东", s:"正南", w:"正西" };
+function northDirValid(d){ return !!NORTH_DIR_NAME[d]; }
+/* 把图片坐标系（0-1000，y 向下）的 box 旋转回「上北下南」坐标系。
+   north_dir=e 表示图上方朝东，需顺时针转 90° 还原；s 转 180°；w 逆时针转 90°。 */
+function rotateBoxToNorth(box, northDir){
+  if(!box) return null;
+  var x1=box[0], y1=box[1], x2=box[2], y2=box[3];
+  switch(northDir){
+    case "n": return [x1, y1, x2, y2];
+    case "e": return [1000-y2, x1, 1000-y1, x2];
+    case "s": return [1000-x2, 1000-y2, 1000-x1, 1000-y1];
+    case "w": return [y1, 1000-x2, y2, 1000-x1];
+    default: return null;
+  }
+}
+/* 房间落宫：以全部房间框的外接矩形为户型范围。
+   传入 northDir 时先把房间框统一到北向坐标再切 3×3 九宫；方向未知返回 null。 */
 var GRID3 = [["乾","坎","艮"],["兑",null,"震"],["坤","离","巽"]];
 function houseBoxOf(rooms){
   var x1=1000, y1=1000, x2=0, y2=0, n=0;
@@ -71,10 +90,20 @@ function roomGong(box, houseBox){
   var row = Math.min(2, Math.max(0, Math.floor(((box[1]+box[3])/2 - houseBox[1]) / h * 3)));
   return GRID3[row][col];
 }
-/* 在户型图上叠加房间落宫层。byGong: {宫: palace对象}；container 需为空元素。 */
+function roomGongNorth(box, houseBox, northDir){
+  var nb = rotateBoxToNorth(box, northDir || "n");
+  return nb ? roomGong(nb, houseBox) : null;
+}
+/* 在户型图上叠加房间落宫层。byGong: {宫: palace对象}；container 需为空元素。
+   ocr.north_dir 为 n/e/s/w 时按指北方向校准落宫（叠加框仍画在原图位置，仅宫位判定用旋转后坐标）。 */
 function renderOcrOverlay(container, imgUrl, ocr, byGong){
   if(typeof document === "undefined" || !container) return false;
-  var house = houseBoxOf(ocr && ocr.rooms);
+  var northDir = (ocr && ocr.north_dir) || "n";
+  if(!northDirValid(northDir)) return false; // 方向未知：不输出确定落宫，由调用方给人工复核入口
+  var northRooms = (ocr && ocr.rooms || []).map(function(r){
+    return { name: r.name, box: rotateBoxToNorth(r.box, northDir) };
+  });
+  var house = houseBoxOf(northRooms);
   if(!house) return false;
   container.innerHTML = "";
   container.style.position = "relative";
@@ -87,7 +116,7 @@ function renderOcrOverlay(container, imgUrl, ocr, byGong){
   container.appendChild(layer);
   ocr.rooms.forEach(function(room){
     if(!room.box || /入户门/.test(room.name || "")) return; // 入户门是标记不是房间，不参与落宫
-    var g = roomGong(room.box, house);
+    var g = roomGongNorth(room.box, house, northDir);
     var j = (g && byGong) ? byGong[g] : null;
     var good = j && (j.base === "大吉" || j.base.indexOf("中吉") === 0);
     var color = !j ? "160,160,160" : good ? "92,185,138" : (j.base === "大凶" ? "224,122,100" : "230,200,134");
@@ -443,5 +472,7 @@ root.YC = { PRICE: PRICE, PRICE_OLD: PRICE_OLD, TITLE: TITLE,
   renderNav: renderNav, devBootstrap: devBootstrap, fmtTime: fmtTime, isMobile: isMobile,
   pseudoQR: pseudoQR, remote: remote, saveImg: saveImg, getImg: getImg,
   ocrFloorplan: ocrFloorplan, doorHintGong: doorHintGong, roomGong: roomGong,
+  northDirValid: northDirValid, rotateBoxToNorth: rotateBoxToNorth, roomGongNorth: roomGongNorth,
+  NORTH_DIR_NAME: NORTH_DIR_NAME,
   houseBoxOf: houseBoxOf, renderOcrOverlay: renderOcrOverlay };
 })(typeof window !== "undefined" ? window : globalThis);

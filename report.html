@@ -116,12 +116,18 @@ function render(order, r){
     ov += '<dt>报告快照</dt><dd class="dim">本报告为支付时保存的快照，算法升级不改变其内容 · 规则版本 '+esc(snapMeta.ruleset_version||"")+' · 校验值 '+esc((snapMeta.sha256||"").slice(0,16))+'…</dd>';
   }
   ov += '</dl>';
-  var hasOverlay = p.img && p.ocr && p.ocr.rooms && p.ocr.rooms.length;
+  /* P0-2 置信分级：方向已识别（north_dir=n/e/s/w）→ 落宫按指北校准；方向未知 → 不输出确定房间吉凶，给人工复核入口 */
+  var northOk = p.ocr && YC.northDirValid && YC.northDirValid(p.ocr.north_dir);
+  var hasOverlay = p.img && p.ocr && p.ocr.rooms && p.ocr.rooms.length && northOk;
+  var northLabel = northOk ? (p.ocr.north_dir === "n" ? "图上方即正北" : "图上方朝"+YC.NORTH_DIR_NAME[p.ocr.north_dir]+"，已按指北方向校准") : "";
   if(p.img) ov += '<div style="margin-top:16px"><div style="font-size:12.5px;color:var(--sub);margin-bottom:8px">'+
-    (hasOverlay ? '已上传户型图 · AI 识别落宫（房间框颜色 = 所在宫吉凶，按上北下南估算）' : '已上传户型图')+'</div>'+
+    (hasOverlay ? '已上传户型图 · AI 识别落宫（'+northLabel+'，房间框颜色 = 所在宫吉凶）' : '已上传户型图')+'</div>'+
     (hasOverlay ? '<div id="planOverlay" style="border-radius:12px;overflow:hidden;border:1px solid var(--line-soft)"></div>'
                 : '<img src="'+p.img+'" style="max-width:100%;border-radius:12px;border:1px solid var(--line-soft)" alt="户型图">')+'</div>';
-  if(hasOverlay) ov += '<div class="hint" style="margin-top:8px">绿色 = 吉宫 · 金色 = 中吉/次凶 · 红色 = 大凶宫；落宫为 AI 按图面比例估算，师傅解读时会复核校准。</div>';
+  if(hasOverlay) ov += '<div class="hint" style="margin-top:8px">绿色 = 吉宫 · 金色 = 中吉/次凶 · 红色 = 大凶宫；落宫为 AI 按图面比例估算并经指北校准，师傅解读时仍会复核。</div>';
+  if(p.img && p.ocr && p.ocr.rooms && p.ocr.rooms.length && !northOk){
+    ov += '<div class="hint" style="margin-top:8px;color:var(--gold2)">方向未知：图中未识别到可靠指北标记，本报告不输出确定房间落宫吉凶；门位级判定不受影响。可在备注补方向后重新识别，或点下方企业微信由风水师人工复核。</div>';
+  }
   if(p.imgDropped) ov += '<div class="hint" style="margin-top:10px">（图片超出本地存储容量，未保存；不影响判定）</div>';
   if(p.note) ov += '<dl class="kv" style="margin-top:10px"><dt>备注</dt><dd class="dim">'+esc(p.note)+'</dd></dl>';
   ov += '</div>';
@@ -186,7 +192,7 @@ function render(order, r){
     '<a class="btn btn-ghost" href="'+(window.YC_CS_URL||'#')+'" target="_blank" rel="noopener">预约上门勘宅</a>'+
     '</div></div>';
 
-  var note = '<div class="foot-note">溯源：大游年歌（卷一p57-58）· 相宅宗旨（p1）· 星宫生克吉凶论（p85-87）· 八星吉凶总要（p63）· 九星年限应验歌（p88-90）；气法四态为师承规则（老唐版），单独分级。本报告为门位级八宅判定'+(hasOverlay?'，房间落宫由 AI 识别户型图并按上北下南估算':'；上传户型图可自动叠加房间级落宫')+'；窝气/死气/背气诊断将在后续版本补入；已购报告以支付时快照为准，算法升级不改变本份报告内容。报告内容属传统居住文化参考信息，不构成购房、居住或投资决策建议。</div>';
+  var note = '<div class="foot-note">溯源：大游年歌（卷一p57-58）· 相宅宗旨（p1）· 星宫生克吉凶论（p85-87）· 八星吉凶总要（p63）· 九星年限应验歌（p88-90）；气法四态为师承规则（老唐版），单独分级。本报告为门位级八宅判定'+(hasOverlay?'，房间落宫由 AI 识别户型图并按指北方向校准叠加':'；上传户型图可自动叠加房间级落宫')+'；窝气/死气/背气诊断将在后续版本补入；已购报告以支付时快照为准，算法升级不改变本份报告内容。报告内容属传统居住文化参考信息，不构成购房、居住或投资决策建议。</div>';
 
   main.innerHTML = ov + grid + list + tbl + hj + cta + note;
   if(hasOverlay){

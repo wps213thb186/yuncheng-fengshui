@@ -56,7 +56,7 @@
       </div>
 
       <div class="field">
-        <label class="req"><b>入户门方位</b>（站在户型图前，按上北下南选门所在方位）</label>
+        <label class="req"><b>入户门方位</b>（图有指北针时按指北针换算；无标注按上北下南；拿不准在备注说明）</label>
         <div class="gong-grid" id="gongGrid"></div>
         <div class="hint" id="doorHint">八宅以门为伏位起大游年——门的位置是全部判定的起点，请务必按户型图方向选择。拿不准可在备注说明，报告解读时由风水师复核。</div>
       </div>
@@ -109,7 +109,7 @@
       <ul class="vs-list">
         <li>售楼书 / 中介平台的标准户型图最佳</li>
         <li>手绘草图也可以，标清入户门和房间即可</li>
-        <li>方向不明时，以户型图默认方向为准（上北下南）</li>
+        <li>图上有指北针或南北标注最佳；方向不明时请在备注说明，方向未知时报告不输出确定房间吉凶，由风水师人工复核</li>
       </ul>
     </div>
     <div class="card">
@@ -146,8 +146,18 @@ var grid=document.getElementById("gongGrid");
 function pickDoor(g, silent){
   if(!cells[g]) return;
   selDoor=g;
-  grid.querySelectorAll(".gong-cell").forEach(function(c){c.classList.remove("sel");});
+  grid.querySelectorAll(".gong-cell").forEach(function(c){c.classList.remove("sel");c.classList.remove("ai");});
   cells[g].classList.add("sel");
+  var dh=document.getElementById("doorHint");
+  if(dh) dh.textContent="已确认门位："+cells[g].textContent.trim()+"。八宅以门为伏位起大游年，门位是全部判定的起点。";
+}
+/* AI 初判只做虚线预选，不代用户确认；最终门位以用户点击为准（P0-2：门位必须二次确认） */
+function aiPickDoor(g){
+  if(!cells[g] || selDoor) return;
+  grid.querySelectorAll(".gong-cell").forEach(function(c){c.classList.remove("ai");});
+  cells[g].classList.add("ai");
+  var dh=document.getElementById("doorHint");
+  if(dh) dh.innerHTML='AI 初判门位为 <b style="color:var(--gold2)">'+cells[g].textContent.trim()+'</b>（虚线框），请点击该宫确认；不准请改选其他方位。';
 }
 GONGS.forEach(function(g){
   var d=document.createElement("div");
@@ -177,10 +187,18 @@ function runOcr(){
     }).join("");
     var g=YC.doorHintGong(d.door_hint);
     var doorMsg = g
-      ? ' · 门方位初判 <b style="color:var(--gold2)">'+g+'（'+({ "乾":"西北","坎":"正北","艮":"东北","兑":"正西","震":"正东","坤":"西南","离":"正南","巽":"东南" })[g]+'）</b>，已为你预选，可点击修改'
+      ? ' · 门方位初判 <b style="color:var(--gold2)">'+g+'（'+({ "乾":"西北","坎":"正北","艮":"东北","兑":"正西","震":"正东","坤":"西南","离":"正南","巽":"东南" })[g]+'）</b>，请在下方点击确认'
       : ' · 门方位未能确定，请手动选择';
-    ocrBox.innerHTML='<div style="color:var(--good)">✓ 识别到 '+d.rooms.length+' 个空间'+doorMsg+'</div><div style="margin-top:6px">'+chips+'</div>';
-    if(g) pickDoor(g);
+    var northMsg = "";
+    if(d.north_dir && YC.northDirValid && YC.northDirValid(d.north_dir)){
+      northMsg = d.north_dir === "n"
+        ? ' · 方向已识别：图上方即正北'
+        : ' · 方向已识别：图上方朝'+YC.NORTH_DIR_NAME[d.north_dir]+'，房间落宫将按指北方向校准';
+    }else{
+      northMsg = ' · 图中未识别到方向标记，房间落宫按方向未知处理（报告不输出确定房间吉凶，可由风水师复核）';
+    }
+    ocrBox.innerHTML='<div style="color:var(--good)">✓ 识别到 '+d.rooms.length+' 个空间'+doorMsg+northMsg+'</div><div style="margin-top:6px">'+chips+'</div>';
+    if(g) aiPickDoor(g);
   }).catch(function(){
     ocrBox.style.display="none"; // 识别失败不阻塞流程
   });
