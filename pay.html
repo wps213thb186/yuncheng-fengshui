@@ -129,24 +129,12 @@ function render(order, payMock){
     return;
   }
 
-  /* 真实支付：自动下单出码（PC 扫码；手机浏览器提示截图后用微信识别） */
-  area.innerHTML = '<p class="m-sub" style="color:var(--sub);font-size:12.5px;margin:10px 0">正在向微信支付下单…</p>';
+  /* 真实支付：PC 扫码；手机微信内 JSAPI 调起；手机浏览器截图后微信识别 */
+  var inWechat = /MicroMessenger/i.test(navigator.userAgent);
   var scene = mobile ? "jsapi" : "native";
-  YC.createPrepay(order.id, scene).catch(function(e){
-    if(mobile) return YC.createPrepay(order.id, "native"); // JSAPI 未开通时回退扫码
-    throw e;
-  }).then(function(p){
-    if(!p) return;
-    if(p.status === "paid"){ location.href = go; return; }
-    if(!p.code_url){ err.textContent = "下单应答异常，请重试"; return; }
-    area.innerHTML =
-      '<p class="m-sub" style="color:var(--sub);font-size:12.5px;margin:10px 0 4px">'+
-        (mobile ? '截图下方二维码 → 打开微信「扫一扫」→ 右上角相册选截图，完成支付'
-                : '请使用微信「扫一扫」完成支付')+'</p>'+
-      '<div class="qr"><canvas id="payQR" width="220" height="220"></canvas></div>'+
-      '<div class="hint" style="margin-top:10px;color:var(--gold2)">等待支付结果，支付成功将自动跳转报告…</div>';
-    var c = document.getElementById("payQR");
-    if(!YC.drawQR(c, p.code_url)){ err.textContent = "二维码渲染失败，请刷新重试"; return; }
+  area.innerHTML = '<p class="m-sub" style="color:var(--sub);font-size:12.5px;margin:10px 0">正在向微信支付下单…</p>';
+
+  function pollPaid(){
     var n = 0;
     var timer = setInterval(function(){
       YC.getOrder(order.id).then(function(o3){
@@ -154,6 +142,51 @@ function render(order, payMock){
         else if(++n > 150){ clearInterval(timer); err.textContent = "等待超时，请刷新页面重试"; }
       }).catch(function(){});
     }, 2000);
+  }
+  function showQR(codeUrl){
+    area.innerHTML =
+      '<p class="m-sub" style="color:var(--sub);font-size:12.5px;margin:10px 0 4px">'+
+        (mobile ? '截图下方二维码 → 打开微信「扫一扫」→ 右上角相册选截图，完成支付'
+                : '请使用微信「扫一扫」完成支付')+'</p>'+
+      '<div class="qr"><canvas id="payQR" width="220" height="220"></canvas></div>'+
+      '<div class="hint" style="margin-top:10px;color:var(--gold2)">等待支付结果，支付成功将自动跳转报告…</div>';
+    var c = document.getElementById("payQR");
+    if(!YC.drawQR(c, codeUrl)){ err.textContent = "二维码渲染失败，请刷新重试"; return; }
+    pollPaid();
+  }
+  function invokeJsapi(params){
+    function callPay(){
+      WeixinJSBridge.invoke("getBrandWCPayRequest", params, function(res){
+        if(res && res.err_msg === "get_brand_wcpay_request:ok"){
+          area.innerHTML = '<p class="m-sub" style="color:var(--good);font-size:13px;margin:12px 0">支付成功，正在生成报告…</p>';
+          pollPaid();
+        }else if(res && res.err_msg === "get_brand_wcpay_request:cancel"){
+          err.textContent = "已取消支付";
+          YC.createPrepay(order.id, "native").then(function(p2){ if(p2 && p2.code_url) showQR(p2.code_url); });
+        }else{
+          err.textContent = "支付未完成，请重试";
+          YC.createPrepay(order.id, "native").then(function(p2){ if(p2 && p2.code_url) showQR(p2.code_url); });
+        }
+      });
+    }
+    if(typeof WeixinJSBridge === "undefined"){
+      document.addEventListener("WeixinJSBridgeReady", callPay, false);
+    }else{ callPay(); }
+  }
+
+  YC.createPrepay(order.id, scene).catch(function(e){
+    if(mobile) return YC.createPrepay(order.id, "native"); // JSAPI 不可用时回退扫码
+    throw e;
+  }).then(function(p){
+    if(!p) return;
+    if(p.status === "paid"){ location.href = go; return; }
+    if(p.pay_params && inWechat){ invokeJsapi(p.pay_params); return; }
+    if(p.pay_params){ // 手机浏览器拿到 jsapi 参数也用不了，回退扫码
+      YC.createPrepay(order.id, "native").then(function(p2){ if(p2 && p2.code_url) showQR(p2.code_url); });
+      return;
+    }
+    if(p.code_url){ showQR(p.code_url); return; }
+    err.textContent = "下单应答异常，请重试";
   }).catch(function(e){
     err.textContent = e.message;
     area.innerHTML = '<div style="margin-top:10px"><button class="btn btn-gold" onclick="location.reload()">重新发起支付</button></div>';

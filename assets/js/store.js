@@ -289,6 +289,18 @@ function pseudoQR(canvas, seedStr){
   function finder(fx,fy){ ctx.fillStyle="#1a1610"; ctx.fillRect(fx*s,fy*s,7*s,7*s); ctx.fillStyle="#f4f1e8"; ctx.fillRect((fx+1)*s,(fy+1)*s,5*s,5*s); ctx.fillStyle="#1a1610"; ctx.fillRect((fx+2)*s,(fy+2)*s,3*s,3*s); }
   finder(0,0); finder(n-7,0); finder(0,n-7);
 }
+/* 按需加载二维码库（真实授权链接需要可扫的真码） */
+function ensureQRLib(cb){
+  if(typeof qrcode !== "undefined") return cb(true);
+  var s = document.createElement("script");
+  s.src = "assets/js/qrcode.min.js";
+  s.onload = function(){ cb(true); };
+  s.onerror = function(){ cb(false); };
+  document.head.appendChild(s);
+}
+function authAuthorize(state){
+  return api("/api/auth/wechat/authorize" + (state ? "?state=" + encodeURIComponent(state) : ""));
+}
 function openLoginModal(onOk){
   if(typeof document === "undefined") return;
   closeLoginModal();
@@ -319,12 +331,29 @@ function openLoginModal(onOk){
   if(mobile){
     btn.onclick = function(){
       btn.disabled = true; btn.textContent = "登录中…";
-      loginMobile().then(done).catch(function(e){ err.textContent = e.message; btn.disabled = false; btn.textContent = "微信一键登录"; });
+      if(!remote()){ loginWechatMock().then(done); return; }
+      serverHealth().then(function(h){
+        if(h && h.mock_mode === false){ // 真实：跳微信网页授权
+          try{ sessionStorage.setItem("yc_auth_back", location.pathname.split("/").pop() || "index.html"); }catch(e){}
+          return authAuthorize("mob").then(function(r){ location.href = r.url; });
+        }
+        return loginMobile().then(done);
+      }).catch(function(e){ err.textContent = e.message; btn.disabled = false; btn.textContent = "微信一键登录"; });
     };
   }else{
     loginQRStart().then(function(q){
       var c = document.getElementById("ycQR");
-      if(c) pseudoQR(c, q.qr_url || String(Date.now()));
+      var realQR = q.qr_url && q.qr_url.indexOf("http") === 0; // 真实授权链接 → 真二维码
+      if(c){
+        if(realQR){
+          ensureQRLib(function(ok){ if(ok) drawQR(c, q.qr_url); else pseudoQR(c, q.qr_url); });
+          btn.style.display = "none"; // 真实模式无模拟确认
+          var sub = mask.querySelector(".m-sub");
+          if(sub) sub.textContent = "请使用微信扫码，并在手机上确认授权";
+        }else{
+          pseudoQR(c, q.qr_url || String(Date.now()));
+        }
+      }
       if(q.ticket){
         timer = setInterval(function(){
           loginQRPoll(q.ticket).then(function(r){ if(r.status === "confirmed") done(); }).catch(function(){});
