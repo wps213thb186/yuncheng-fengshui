@@ -428,7 +428,7 @@ function renderNav(){
   var u = user();
   var html = u
     ? '<a class="keep" href="orders.html">我的订单</a><span class="nav-user">' + u.nick + '</span><a class="keep" id="ycLogout" href="#">退出</a>'
-    : '<a class="keep" id="ycLoginLink" href="#">微信登录</a>';
+    : '<a class="keep btn btn-gold btn-sm" id="ycLoginLink" href="#">微信登录</a>';
   nav.insertAdjacentHTML("beforeend", html);
   var lo = document.getElementById("ycLogout");
   if(lo) lo.onclick = function(e){ e.preventDefault(); logout(); location.href = "index.html"; };
