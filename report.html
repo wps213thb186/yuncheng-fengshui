@@ -33,7 +33,7 @@
 
 <main id="main">
 <div class="wrap page-head">
-  <div class="eyebrow">STEP 04 · 报告</div>
+  <div class="eyebrow">报告</div>
   <h1 id="rTitle">户型居住环境分析报告</h1>
   <p class="sub" id="rMeta"></p>
   <div class="flowbar">
@@ -140,7 +140,7 @@ function render(order, r){
     '<dt>吉凶分布</dt><dd>大吉宫 <b style="color:var(--good)">'+r.counts.ji+'</b> 处 · 中吉宫 <b style="color:var(--gold2)">'+r.counts.zhongji+'</b> 处 · 大凶宫 <b style="color:var(--bad)">'+r.counts.daxiong+'</b> 处 · 其余 '+(8-r.counts.ji-r.counts.zhongji-r.counts.daxiong)+' 处</dd>';
   if(r.minggua){
     var mg = r.minggua;
-    ov += '<dt>命卦匹配</dt><dd>'+p.birthYear+' 年'+(p.gender||"男")+'命 · '+mg.gua+'卦（'+mg.group+'）——<b style="color:'+(mg.match?"var(--good)":"var(--bad)")+'">'+(mg.match?"与本宅相配":"与本宅不相配，可参考下方改门对比")+'</b><br><span class="dim" style="color:var(--sub);font-size:12px">通行命卦原则（非本书明文）；传统以立春为年界，此处按公历年简化</span></dd>';
+    ov += '<dt>命卦匹配</dt><dd>'+p.birthYear+' 年'+(p.gender||"男")+'命 · '+mg.gua+'卦（'+mg.group+'）：<b style="color:'+(mg.match?"var(--good)":"var(--bad)")+'">'+(mg.match?"与本宅相配":"与本宅不相配，可参考下方改门对比")+'</b><br><span class="dim" style="color:var(--sub);font-size:12px">通行命卦原则（非本书明文）；传统以立春为年界，此处按公历年简化</span></dd>';
   }
   ov += '<dt>引擎校验</dt><dd class="dim">八宅判定引擎回归对账 <b style="color:var(--good)">'+(r.engine_check.pass ? (r.engine_check.total+"/"+r.engine_check.total+" 通过") : "异常")+'</b>'+(YC.remote()?"（服务端引擎）":"（本地引擎）")+'</dd>';
   if(snapMeta && snapMeta.snapshot){
@@ -198,7 +198,7 @@ function render(order, r){
   /* ---- 改门对比 ---- */
   var best = r.door_compare.length ? r.door_compare[0].door : null;
   var tbl = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">气</span>改门 · 气的走向</h3>'+
-    '<p style="font-size:12.5px;color:var(--sub);margin-bottom:16px">「门为宅主房为宾，门转星移定君臣」——门一换，八星随门整体重排。下表为 8 个门位的吉凶分布对比，供改门或选房参考。</p><div class="tbl-wrap"><table class="tbl">'+
+    '<p style="font-size:12.5px;color:var(--sub);margin-bottom:16px">「门为宅主房为宾，门转星移定君臣」。门一换，八星随门整体重排。下表为 8 个门位的吉凶分布对比，供改门或选房参考。</p><div class="tbl-wrap"><table class="tbl">'+
     '<tr><th>门位</th><th>宅组</th><th>大吉</th><th>中吉</th><th>大凶</th><th>备注</th></tr>';
   r.door_compare.forEach(function(s){
     var tag = s.door===r.door ? '<span class="badge b-gold">当前门位</span>' : (s.door===best ? '<span class="badge b-good">较优</span>' : '');
