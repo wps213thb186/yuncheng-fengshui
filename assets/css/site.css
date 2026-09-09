@@ -28,7 +28,7 @@ a{color:var(--gold2)}
 .topbar .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:16px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
 .brand-logo{width:44px;height:44px;border-radius:50%;display:block;flex:none}
-.brand-text{display:flex;flex-direction:column;gap:1px}
+.brand-text{display:flex;flex-direction:column;gap:5px}
 .brand-name{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:.08em;line-height:1.15}
 .brand-sub{font-size:10.5px;color:#a5906a;letter-spacing:.2em;line-height:1.1}
 .nav{display:flex;align-items:center;gap:26px}
