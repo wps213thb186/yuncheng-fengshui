@@ -26,6 +26,30 @@
     });
   }
 
+  /* --- 服务下拉 --- */
+  var trigger = document.querySelector(".nav-trigger");
+  var submenu = document.getElementById("ycSvcMenu");
+  if(trigger && submenu){
+    trigger.addEventListener("click", function(e){
+      e.stopPropagation();
+      var open = submenu.classList.toggle("open");
+      trigger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    submenu.addEventListener("click", function(){ closeSub(); });
+    document.addEventListener("click", function(e){
+      if(!submenu.classList.contains("open")) return;
+      if(!submenu.contains(e.target) && e.target !== trigger) closeSub();
+    });
+    document.addEventListener("keydown", function(e){
+      if(e.key === "Escape" && submenu.classList.contains("open")){ closeSub(); trigger.focus(); }
+    });
+  }
+  function closeSub(){
+    if(!submenu) return;
+    submenu.classList.remove("open");
+    trigger.setAttribute("aria-expanded", "false");
+  }
+
   /* --- 当前页高亮 --- */
   var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
   Array.prototype.forEach.call(document.querySelectorAll(".nav a[href]"), function(a){
@@ -33,6 +57,8 @@
     if(href && href === here && !a.classList.contains("btn")){
       a.classList.add("on");
       a.setAttribute("aria-current", "page");
+      // 子项命中时，父级「服务」一并高亮
+      if(trigger && submenu && submenu.contains(a)) trigger.classList.add("on");
     }
   });
 

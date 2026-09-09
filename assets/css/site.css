@@ -439,3 +439,36 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .vision-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px 52px;max-width:980px}
 .vision-cols p{font-size:14px;color:var(--sub);line-height:1.95}
 @media(max-width:860px){.vision-cols{grid-template-columns:1fr;gap:14px}}
+
+/* ---------- 导航下拉（服务） ---------- */
+.nav-group{position:relative;display:flex;align-items:center}
+.nav-group::after{content:"";position:absolute;top:100%;left:0;right:0;height:16px} /* 悬停缓冲区 */
+.nav-trigger{background:none;border:none;padding:0;cursor:pointer;font-family:var(--sans);
+  font-size:13.5px;letter-spacing:.04em;color:var(--sub);display:inline-flex;align-items:center;gap:6px;transition:color .15s}
+.nav-trigger:hover,.nav-group:hover .nav-trigger,.nav-trigger[aria-expanded="true"],.nav-trigger.on{color:var(--gold2)}
+.caret{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;
+  border-top:4px solid currentColor;transition:transform .18s var(--ease)}
+.nav-trigger[aria-expanded="true"] .caret{transform:rotate(180deg)}
+.submenu{position:absolute;top:calc(100% + 16px);left:50%;margin-left:-95px;z-index:60;width:190px;
+  transform:translateY(-6px);
+  background:#11151d;border:1px solid var(--line);border-radius:14px;padding:8px;
+  box-shadow:0 18px 44px rgba(0,0,0,.55);
+  opacity:0;visibility:hidden;transition:opacity .18s var(--ease),transform .18s var(--ease),visibility .18s}
+.nav-group:hover .submenu,.nav-group:focus-within .submenu,.submenu.open{opacity:1;visibility:visible;transform:translateY(0)}
+.submenu a{display:block;padding:9px 14px;border-radius:9px;font-size:13.5px;color:var(--sub);
+  text-decoration:none;white-space:nowrap;transition:background .15s,color .15s}
+.submenu a:hover{background:rgba(201,163,92,.08);color:var(--gold2)}
+.submenu a.on{color:var(--gold2)}
+.submenu a.on::after{display:none}
+
+@media(max-width:900px){
+  .nav-group{display:block}
+  .nav-group::after{display:none}
+  .nav-trigger{width:100%;justify-content:space-between;padding:13px 2px;font-size:14.5px;
+    border-bottom:1px solid var(--line-soft)}
+  .submenu{position:static;left:auto;margin-left:0;width:auto;transform:none;display:none;
+    background:none;border:none;box-shadow:none;border-radius:0;
+    padding:4px 0 10px 14px;border-bottom:1px solid var(--line-soft)}
+  .submenu.open{display:block}
+  .nav .submenu a{padding:10px 2px;border-bottom:none;font-size:14px}
+}

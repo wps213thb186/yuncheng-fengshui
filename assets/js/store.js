@@ -422,15 +422,14 @@ function requireAuth(onOk){
 function renderNav(){
   if(typeof document === "undefined") return;
   initFromUrl();
-  var nav = document.querySelector(".nav"); if(!nav) return;
+  // 登录态入口不再进入主导航；仅当页面提供 #ycAccount 容器时渲染
+  var nav = document.getElementById("ycAccount"); if(!nav) return;
   nav.querySelectorAll(".keep, .nav-user").forEach(function(n){ n.remove(); }); // 幂等：登录态变化后可重复渲染
   var u = user();
   var html = u
     ? '<a class="keep" href="orders.html">我的订单</a><span class="nav-user">' + u.nick + '</span><a class="keep" id="ycLogout" href="#">退出</a>'
     : '<a class="keep" id="ycLoginLink" href="#">微信登录</a>';
-  var cta = nav.querySelector(".btn"); // 登录态入口排在主导航之后、CTA 之前
-  if(cta) cta.insertAdjacentHTML("beforebegin", html);
-  else nav.insertAdjacentHTML("beforeend", html);
+  nav.insertAdjacentHTML("beforeend", html);
   var lo = document.getElementById("ycLogout");
   if(lo) lo.onclick = function(e){ e.preventDefault(); logout(); location.href = "index.html"; };
   var li = document.getElementById("ycLoginLink");
