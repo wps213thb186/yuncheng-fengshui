@@ -27,9 +27,10 @@ a{color:var(--gold2)}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(12,15,20,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line-soft)}
 .topbar .wrap{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:16px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
-.brand-seal{width:38px;height:38px;border-radius:12px 12px 9px 12px;background:linear-gradient(160deg,#3a2f1a,#221b0e);color:#e6c886;border:1px solid rgba(230,200,134,.4);display:flex;align-items:center;justify-content:center;font-family:var(--kai);font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,.5),0 0 18px rgba(201,163,92,.12)}
-.brand-name{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:.08em}
-.brand-sub{font-size:10.5px;color:#a5906a;letter-spacing:.2em}
+.brand-logo{width:44px;height:44px;border-radius:50%;display:block;flex:none}
+.brand-text{display:flex;flex-direction:column;gap:1px}
+.brand-name{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:.08em;line-height:1.15}
+.brand-sub{font-size:10.5px;color:#a5906a;letter-spacing:.2em;line-height:1.1}
 .nav{display:flex;align-items:center;gap:26px}
 .nav a{color:var(--sub);text-decoration:none;font-size:13.5px;letter-spacing:.04em;transition:color .15s;cursor:pointer}
 .nav a:hover{color:var(--gold2)}
