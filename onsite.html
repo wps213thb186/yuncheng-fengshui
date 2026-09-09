@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的订单 - 运乘风水</title>
-<meta name="robots" content="noindex">
+<title>线下上门勘宅 - 运乘 | 罗盘定坐向 · 逐间勘察 · 书面调整清单</title>
+<meta name="description" content="运乘上门勘宅：执业风水师到现场用罗盘定坐向、逐间勘察，交付按优先级排列的书面调整清单。按面积与城市计价，需提前预约。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23241d10'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23e6c886' font-family='serif'>运</text></svg>">
 <link rel="stylesheet" href="assets/css/site.css">
 </head>
@@ -39,13 +39,61 @@
 </header>
 
 <main id="main">
+<div class="wrap"><nav class="crumb" aria-label="面包屑"><a href="index.html">首页</a><i>/</i>上门勘宅</nav></div>
+
 <div class="wrap page-head">
-  <div class="eyebrow">订单中心</div>
-  <h1>我的订单与报告</h1>
-  <p class="sub">全部订单与已生成的报告都保存在这里，已购报告以支付时快照保存，可随时回看。</p>
+  <div class="eyebrow">服务 · 叁</div>
+  <h1>线下上门勘宅</h1>
+  <p class="sub">重要的事情，还是要人到现场。户型图画不出的层高、采光、气流、周边环境，以及图纸与实际的出入，都需要站在屋里才看得见。</p>
 </div>
 
-<div class="wrap page-body" id="main"></div>
+<section class="page-body">
+  <div class="wrap">
+    <div class="steps">
+      <div class="step reveal"><div class="step-num">壹</div><h3><span class="seal">测</span>罗盘定坐向</h3><p>现场测量确定真实坐向，与户型图标注核对。测量结果是后续全部判断的基准，误差在这一步就要消掉。</p></div>
+      <div class="step reveal"><div class="step-num">贰</div><h3><span class="seal">勘</span>逐间勘察</h3><p>门、主、灶三要逐一定位，各房间落宫复核，同时观察外部形势与内部动线，记录图纸上不存在的问题。</p></div>
+      <div class="step reveal"><div class="step-num">叁</div><h3><span class="seal">交</span>书面调整清单</h3><p>按优先级给出可执行项：哪些必须改、哪些建议改、哪些不必动，以及每项的大致代价与替代方案。</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow reveal">什么时候值得约</div>
+    <h2 class="reveal">这几种情况，<span class="zh">线上判断不够</span></h2>
+    <div class="two-col">
+      <div class="block reveal">
+        <ul class="vs-list">
+          <li>已经定房，准备动结构或大改格局</li>
+          <li>户型图与实际出入较大，或干脆没有图纸</li>
+          <li>周边有明显的外部形势需要现场判断</li>
+          <li>报告结论与自身感受不一致，想要复核</li>
+        </ul>
+      </div>
+      <div class="block reveal">
+        <h3 style="font-size:17px;margin-bottom:12px"><span class="seal">价</span>计价与排期</h3>
+        <p style="font-size:13.5px;color:var(--sub)">按房屋面积与所在城市计价，跨城需另计行程。请先通过联系页面说明基本情况，我们确认后报价并安排排期。</p>
+        <a class="btn btn-ghost" style="margin-top:18px" href="contact.html">说明情况并预约</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="band reveal">
+      <div>
+        <h2>拿不准要不要上门？</h2>
+        <p>可以先出一份线上报告，看完再决定这趟是否必要。</p>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-gold" href="contact.html">预约上门勘宅</a>
+        <a class="btn btn-ghost" href="product.html">先看线上报告</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <footer>
@@ -82,53 +130,9 @@
 </footer>
 
 <script src="assets/js/config.js"></script>
-<script src="assets/js/engine.js"></script>
 <script src="assets/js/store.js"></script>
 <script src="assets/js/site.js"></script>
-<script>
-(function(){ "use strict";
-YC.devBootstrap();
-YC.renderNav();
-/* 会话体检：token 失效时自动清理 */
-if(YC.user() && YC.remote()){ YC.authMe().catch(function(){ YC.logout(); YC.renderNav(); location.reload(); }); }
-var main = document.getElementById("main");
-
-if(!YC.user()){
-  main.innerHTML = '<div class="card empty"><div class="e-seal">单</div><p>登录后即可查看你的订单与报告</p></div>';
-  YC.requireAuth(function(){ location.reload(); });
-  return;
-}
-Promise.resolve(YC.listOrders()).then(function(os){
-  if(!os.length){
-    main.innerHTML = '<div class="card empty"><div class="e-seal">空</div><p>还没有订单。上传一张户型图，3 分钟拿到第一份报告。</p><div style="margin-top:18px"><a class="btn btn-gold" href="upload.html">上传户型图</a></div></div>';
-    return;
-  }
-  var html = '<div class="card" style="padding:10px 28px">';
-  os.forEach(function(o){
-    var paid = o.status === "paid";
-    var door = o.plan && o.plan.door ? ("入户门·" + o.plan.door + "（" + YC_ENG.DIRNAME[o.plan.door] + "）") : "";
-    var meta = [YC.fmtTime(o.createdAt), door, o.plan && o.plan.area ? (o.plan.area + "㎡") : ""].filter(Boolean).join(" · ");
-    html += '<div class="order-row">'+
-      (o.plan && o.plan.img
-        ? '<div class="order-thumb" style="background-image:url(' + o.plan.img + ')"></div>'
-        : '<div class="order-thumb">运</div>')+
-      '<div class="order-main"><div class="o-title">' + o.title + ' <span style="color:var(--sub);font-size:12px">' + o.id + '</span></div>'+
-      '<div class="o-meta">' + meta + '</div></div>'+
-      '<div class="order-act">'+
-        (paid ? '<span class="badge b-good">已出报告</span>' : '<span class="badge b-wait">待支付 ¥' + o.amount.toFixed(1) + '</span>')+
-        (paid
-          ? '<a class="btn btn-gold btn-sm" href="report.html?oid=' + encodeURIComponent(o.id) + '">查看报告</a>'
-          : '<a class="btn btn-ghost btn-sm" href="pay.html?oid=' + encodeURIComponent(o.id) + '">去支付</a>')+
-      '</div></div>';
-  });
-  html += '</div><div class="hint" style="margin-top:14px">'+
-    (YC.remote() ? "订单保存在当前登录账号下；内测期间建议使用同一浏览器与登录方式访问。" : "内测阶段订单保存在本机浏览器；正式上线后同步到登录账号。")+'</div>';
-  main.innerHTML = html;
-}).catch(function(e){
-  main.innerHTML = '<div class="card empty"><div class="e-seal">错</div><p>订单加载失败：' + e.message + '</p></div>';
-});
-})();
-</script>
+<script>YC.renderNav();</script>
 
 </body>
 </html>

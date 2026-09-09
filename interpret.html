@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的订单 - 运乘风水</title>
-<meta name="robots" content="noindex">
+<title>风水师一对一解读 - 运乘 | 报告答疑 · 多户型对比 · 装修前置咨询</title>
+<meta name="description" content="运乘一对一解读：由执业风水师通过企业微信解读你的户型分析报告，做多户型对比与装修前置咨询，把标准化判断落到你的实际处境上。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23241d10'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23e6c886' font-family='serif'>运</text></svg>">
 <link rel="stylesheet" href="assets/css/site.css">
 </head>
@@ -39,13 +39,64 @@
 </header>
 
 <main id="main">
+<div class="wrap"><nav class="crumb" aria-label="面包屑"><a href="index.html">首页</a><i>/</i>一对一解读</nav></div>
+
 <div class="wrap page-head">
-  <div class="eyebrow">订单中心</div>
-  <h1>我的订单与报告</h1>
-  <p class="sub">全部订单与已生成的报告都保存在这里，已购报告以支付时快照保存，可随时回看。</p>
+  <div class="eyebrow">服务 · 贰</div>
+  <h1>风水师一对一解读</h1>
+  <p class="sub">报告给的是标准化判断，你的处境却是具体的：预算多少、家里几口人、这堵墙能不能动。这一环由执业风水师接手。</p>
 </div>
 
-<div class="wrap page-body" id="main"></div>
+<section class="page-body">
+  <div class="wrap">
+    <div class="pillars">
+      <div class="pillar reveal"><div class="pillar-ico">问</div><h3>报告答疑</h3><p>哪一条最要紧、哪一条可以先放着，化解建议在你家怎么落地，把报告翻译成下一步动作。</p></div>
+      <div class="pillar reveal"><div class="pillar-ico">比</div><h3>多户型对比</h3><p>几套房各有长短时，按你的实际诉求（主卧优先、还是灶位优先）排出取舍顺序。</p></div>
+      <div class="pillar reveal"><div class="pillar-ico">装</div><h3>装修前置咨询</h3><p>动工前调整门位、墙体、灶位的成本，远低于返工。这一步值得在设计定稿前做。</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="two-col">
+      <div class="block reveal">
+        <h3 style="font-size:17px;margin-bottom:14px"><span class="seal">式</span>怎么进行</h3>
+        <ul class="price-list">
+          <li>通过企业微信文字或语音沟通，不限于一次往返</li>
+          <li>需先出具至少一份户型分析报告，师傅据此展开</li>
+          <li>可同时带上多套房源的报告做横向比较</li>
+          <li>装修方案、平面图等材料一并发来，判断更贴合</li>
+        </ul>
+      </div>
+      <div class="block reveal">
+        <h3 style="font-size:17px;margin-bottom:14px"><span class="seal">限</span>边界在哪</h3>
+        <ul class="vs-list">
+          <li>不到现场，坐向与外部形势仍以报告标注的待复核为准。</li>
+          <li>不做个人命理批算，讨论范围限于居住空间本身。</li>
+          <li>结论属于环境参考信息，不构成购房或装修的决策建议。</li>
+        </ul>
+      </div>
+    </div>
+    <p class="hint" style="margin-top:20px">按次咨询计价，具体以会话中确认为准。</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="band reveal">
+      <div>
+        <h2>先有一份报告，解读才有的谈</h2>
+        <p>上传户型图，9.9 元拿到基础判断，再把看不懂的地方交给师傅。</p>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-gold" href="product.html">了解户型分析报告</a>
+        <a class="btn btn-ghost" href="contact.html">联系我们</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <footer>
@@ -82,53 +133,9 @@
 </footer>
 
 <script src="assets/js/config.js"></script>
-<script src="assets/js/engine.js"></script>
 <script src="assets/js/store.js"></script>
 <script src="assets/js/site.js"></script>
-<script>
-(function(){ "use strict";
-YC.devBootstrap();
-YC.renderNav();
-/* 会话体检：token 失效时自动清理 */
-if(YC.user() && YC.remote()){ YC.authMe().catch(function(){ YC.logout(); YC.renderNav(); location.reload(); }); }
-var main = document.getElementById("main");
-
-if(!YC.user()){
-  main.innerHTML = '<div class="card empty"><div class="e-seal">单</div><p>登录后即可查看你的订单与报告</p></div>';
-  YC.requireAuth(function(){ location.reload(); });
-  return;
-}
-Promise.resolve(YC.listOrders()).then(function(os){
-  if(!os.length){
-    main.innerHTML = '<div class="card empty"><div class="e-seal">空</div><p>还没有订单。上传一张户型图，3 分钟拿到第一份报告。</p><div style="margin-top:18px"><a class="btn btn-gold" href="upload.html">上传户型图</a></div></div>';
-    return;
-  }
-  var html = '<div class="card" style="padding:10px 28px">';
-  os.forEach(function(o){
-    var paid = o.status === "paid";
-    var door = o.plan && o.plan.door ? ("入户门·" + o.plan.door + "（" + YC_ENG.DIRNAME[o.plan.door] + "）") : "";
-    var meta = [YC.fmtTime(o.createdAt), door, o.plan && o.plan.area ? (o.plan.area + "㎡") : ""].filter(Boolean).join(" · ");
-    html += '<div class="order-row">'+
-      (o.plan && o.plan.img
-        ? '<div class="order-thumb" style="background-image:url(' + o.plan.img + ')"></div>'
-        : '<div class="order-thumb">运</div>')+
-      '<div class="order-main"><div class="o-title">' + o.title + ' <span style="color:var(--sub);font-size:12px">' + o.id + '</span></div>'+
-      '<div class="o-meta">' + meta + '</div></div>'+
-      '<div class="order-act">'+
-        (paid ? '<span class="badge b-good">已出报告</span>' : '<span class="badge b-wait">待支付 ¥' + o.amount.toFixed(1) + '</span>')+
-        (paid
-          ? '<a class="btn btn-gold btn-sm" href="report.html?oid=' + encodeURIComponent(o.id) + '">查看报告</a>'
-          : '<a class="btn btn-ghost btn-sm" href="pay.html?oid=' + encodeURIComponent(o.id) + '">去支付</a>')+
-      '</div></div>';
-  });
-  html += '</div><div class="hint" style="margin-top:14px">'+
-    (YC.remote() ? "订单保存在当前登录账号下；内测期间建议使用同一浏览器与登录方式访问。" : "内测阶段订单保存在本机浏览器；正式上线后同步到登录账号。")+'</div>';
-  main.innerHTML = html;
-}).catch(function(e){
-  main.innerHTML = '<div class="card empty"><div class="e-seal">错</div><p>订单加载失败：' + e.message + '</p></div>';
-});
-})();
-</script>
+<script>YC.renderNav();</script>
 
 </body>
 </html>

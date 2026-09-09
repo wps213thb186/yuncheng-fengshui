@@ -472,3 +472,39 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   .submenu.open{display:block}
   .nav .submenu a{padding:10px 2px;border-bottom:none;font-size:14px}
 }
+
+/* ==========================================================================
+   户型分析报告页（body.page-product）：保留改版前的墨金视觉，仅此页生效
+   ========================================================================== */
+body.page-product{
+  background:radial-gradient(1100px 480px at 50% -90px, rgba(201,163,92,.10), transparent 62%),
+             linear-gradient(180deg,#0e1218 0%,var(--bg) 38%,var(--bg2) 100%);
+  background-attachment:fixed}
+body.page-product .hero h1{
+  background:linear-gradient(115deg,#f2e9d2 15%,#dfc084 58%,#a8823f 95%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+body.page-product .card{
+  background:linear-gradient(180deg,#161b26 0%,#11151d 100%);
+  box-shadow:0 18px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(230,200,134,.07)}
+/* 还原卡片内边距：v3 把这些块降级成了「发丝线 + 留白」 */
+body.page-product .step,
+body.page-product .proof,
+body.page-product .vs-card{padding:28px;border-top:none;border-radius:var(--radius)}
+body.page-product .vs-card{border:1px solid var(--line-soft)}
+body.page-product .vs-card.good{border-color:rgba(201,163,92,.3)}
+body.page-product .steps,
+body.page-product .proof-grid{gap:20px}
+body.page-product .eyebrow{font-size:12px;letter-spacing:.32em}
+/* 三级溯源与早鸟价标签还原成胶囊 */
+body.page-product .src-tags{gap:8px}
+body.page-product .src-tag{font-size:11px;padding:3px 12px;border-radius:999px;letter-spacing:.06em;display:inline-block}
+body.page-product .src-tag::before{content:none}
+body.page-product .src-1{background:rgba(84,104,138,.25);color:#9db4d6;border:1px solid rgba(84,104,138,.4)}
+body.page-product .src-2{background:rgba(201,163,92,.15);color:var(--gold2);border:1px solid rgba(201,163,92,.35)}
+body.page-product .src-3{background:rgba(125,97,82,.2);color:#c4a68e;border:1px solid rgba(125,97,82,.4)}
+body.page-product .price-badge{position:absolute;top:-13px;left:28px;display:inline-block;margin:0;
+  background:linear-gradient(160deg,#e0bd77,#c9a35c);color:#201808;
+  font-size:11.5px;font-weight:700;padding:4px 14px;border-radius:999px;letter-spacing:.1em}
+
+/* 导航中的登录态容器：让其子项直接参与导航的 flex 排布 */
+.nav-account{display:contents}
