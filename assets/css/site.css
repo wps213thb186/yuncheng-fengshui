@@ -284,11 +284,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .topbar .wrap{position:relative}
 
 /* ---------- 首页 Hero ---------- */
-.hm-hero{position:relative;padding:112px 0 88px;overflow:hidden}
+.hm-hero{position:relative;padding:88px 0;overflow:hidden;
+  min-height:calc(100vh - 69px);min-height:min(calc(100svh - 69px),920px);
+  display:flex;flex-direction:column;justify-content:flex-end}
 .hm-hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:48px;align-items:center}
 .hm-kicker{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.22em;color:var(--gold);border:1px solid rgba(201,163,92,.28);border-radius:999px;padding:6px 16px;margin-bottom:24px}
 .hm-kicker i{width:5px;height:5px;border-radius:50%;background:var(--gold);font-style:normal;flex:none}
-.hm-hero h1{font-size:clamp(36px,4.6vw,58px);line-height:1.24;letter-spacing:.01em;margin-bottom:22px;
+.hm-hero h1{font-size:clamp(36px,5vw,64px);line-height:1.24;letter-spacing:.01em;margin-bottom:22px;
   background:linear-gradient(112deg,#f4ecd8 12%,#e2c58a 56%,#a8823f 96%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hm-hero .lead{color:var(--sub);font-size:16.5px;max-width:540px;margin-bottom:32px}
 .hm-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:30px}
@@ -298,8 +300,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .hm-trust span{font-size:12px;color:var(--sub);letter-spacing:.06em}
 
 /* 罗盘九宫图形 */
-.hm-figure{position:relative;display:flex;align-items:center;justify-content:center;min-height:380px}
-.hm-compass{width:min(100%,400px);height:auto}
+.hm-figure{position:relative;display:flex;align-items:center;justify-content:center;min-height:440px}
+.hm-compass{width:min(100%,440px);height:auto}
 .hm-compass path,.hm-compass circle,.hm-compass rect{stroke-width:1;vector-effect:non-scaling-stroke}
 /* 外圈二十四山顺时针、中圈八卦逆时针，内圈洛书九宫静止 */
 .cp-ring-a{animation:hm-spin 150s linear infinite;transform-origin:200px 200px}
@@ -308,7 +310,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 @keyframes hm-spin-r{to{transform:rotate(-360deg)}}
 .hm-figure-core{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .hm-figure-core span{font-family:var(--kai);font-size:56px;color:var(--gold2);text-shadow:0 0 40px rgba(201,163,92,.35)}
-@media(max-width:900px){.hm-hero{padding:72px 0 56px}.hm-hero-grid{grid-template-columns:1fr;gap:32px}.hm-figure{min-height:260px;order:-1}.hm-compass{width:264px}.hm-figure-core span{font-size:38px}}
+@media(max-width:900px){.hm-hero{padding:72px 0 56px;min-height:0;display:block}.hm-hero-grid{grid-template-columns:1fr;gap:32px}.hm-figure{min-height:260px;order:-1}.hm-compass{width:264px}.hm-figure-core span{font-size:38px}}
 
 /* ---------- 通用区块头 ---------- */
 .hm-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:36px;flex-wrap:wrap}
