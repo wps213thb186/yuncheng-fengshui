@@ -258,7 +258,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .reveal{opacity:1!important;transform:none!important;transition:none!important}
-  .hm-compass{animation:none!important}
+  .hm-compass,.cp-ring-a,.cp-ring-b{animation:none!important}
 }
 
 /* ---------- 导航（增加移动端抽屉 + 当前项） ---------- */
@@ -299,11 +299,16 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* 罗盘九宫图形 */
 .hm-figure{position:relative;display:flex;align-items:center;justify-content:center;min-height:380px}
-.hm-compass{width:min(100%,400px);height:auto;animation:hm-spin 90s linear infinite;transform-origin:50% 50%}
+.hm-compass{width:min(100%,400px);height:auto}
+.hm-compass path,.hm-compass circle,.hm-compass rect{stroke-width:1;vector-effect:non-scaling-stroke}
+/* 外圈二十四山顺时针、中圈八卦逆时针，内圈洛书九宫静止 */
+.cp-ring-a{animation:hm-spin 150s linear infinite;transform-origin:200px 200px}
+.cp-ring-b{animation:hm-spin-r 110s linear infinite;transform-origin:200px 200px}
 @keyframes hm-spin{to{transform:rotate(360deg)}}
+@keyframes hm-spin-r{to{transform:rotate(-360deg)}}
 .hm-figure-core{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .hm-figure-core span{font-family:var(--kai);font-size:56px;color:var(--gold2);text-shadow:0 0 40px rgba(201,163,92,.35)}
-@media(max-width:900px){.hm-hero{padding:72px 0 56px}.hm-hero-grid{grid-template-columns:1fr;gap:32px}.hm-figure{min-height:260px;order:-1}.hm-compass{width:230px}.hm-figure-core span{font-size:38px}}
+@media(max-width:900px){.hm-hero{padding:72px 0 56px}.hm-hero-grid{grid-template-columns:1fr;gap:32px}.hm-figure{min-height:260px;order:-1}.hm-compass{width:264px}.hm-figure-core span{font-size:38px}}
 
 /* ---------- 通用区块头 ---------- */
 .hm-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:36px;flex-wrap:wrap}
