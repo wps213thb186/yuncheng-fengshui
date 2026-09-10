@@ -1,2 +1,10 @@
 Claude outputs/
 .DS_Store
+
+# 第三方验证文件
+MP_verify_*.txt
+
+# SSL配置文件
+.well-known/
+
+.user.ini
