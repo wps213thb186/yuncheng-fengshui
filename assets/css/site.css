@@ -459,3 +459,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* 导航中的登录态容器：让其子项直接参与导航的 flex 排布 */
 .nav-account{display:contents}
+
+/* 导航内的按钮：.nav a（0,1,1）本会盖过 .btn-gold（0,1,0）的文字色，
+   导致金底上出现灰字。这里按钮类各自把文字色拿回来。 */
+.nav a.btn-gold,.nav a.btn-gold:hover{color:#201808}
+.nav a.btn-ghost,.nav a.btn-ghost:hover{color:var(--ink)}
+.nav a.btn-wechat,.nav a.btn-wechat:hover{color:#fff}
