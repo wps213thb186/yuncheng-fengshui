@@ -50,6 +50,9 @@ a{color:var(--gold2)}
 .btn-block{width:100%}
 
 /* Hero */
+/* hero 改成 flex 容器后，.wrap 的 margin:0 auto 会阻止交叉轴拉伸，
+   使其退化为按内容收缩（产品页实测只有 816px）。显式给满宽。 */
+.hero > .wrap,.hm-hero > .wrap{width:100%}
 .hero{position:relative;padding:56px 0 64px;text-align:left;overflow:hidden;
   min-height:calc(100vh - 69px);min-height:min(calc(100svh - 69px),880px);
   display:flex;flex-direction:column;justify-content:center}
