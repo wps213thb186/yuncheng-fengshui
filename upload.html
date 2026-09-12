@@ -27,10 +27,10 @@
           <a href="product.html">户型分析报告</a>
           <a href="interpret.html">一对一解读</a>
           <a href="onsite.html">上门勘宅</a>
-          <a href="commercial.html">商业空间顾问</a>
+          <a href="goods.html">文创器物</a>
         </div>
       </div>
-      <a href="cases.html">服务案例</a>
+      <a href="cases.html">服务场景</a>
       <a href="about.html">关于运乘</a>
       <a href="contact.html">联系我们</a>
       <span class="nav-account" id="ycAccount"></span>
@@ -60,7 +60,7 @@
         <div class="drop" id="drop">
           <div class="big">⌂</div>
           点击选择户型图图片（JPG/PNG）<br>
-          <span style="font-size:12px;opacity:.75">图片仅用于 AI 识别与本机展示，服务器不保存原图</span>
+          <span style="font-size:12px;opacity:.75">图片将传输至第三方视觉识别服务用于房间与门位识别；我方服务器不保存原图，原图仅缓存在本机浏览器</span>
           <img id="preview" style="display:none" alt="户型图预览">
         </div>
         <input type="file" id="file" accept="image/*" style="display:none">
@@ -96,7 +96,7 @@
           </select>
         </div>
         <div class="field">
-          <label><b>常住成员</b>（出生年份 + 性别，用于命卦匹配）</label>
+          <label><b>常住成员</b>（选填，出生年份 + 性别，仅用于报告中的命卦匹配；不填不影响报告出具）</label>
           <div style="display:flex;gap:10px">
             <input class="input" id="fYear" type="number" min="1920" max="2025" placeholder="例：1990">
             <select class="input" id="fGender" style="max-width:92px"><option>男</option><option>女</option></select>
@@ -111,7 +111,7 @@
 
       <div id="errBox" style="display:none;color:var(--bad);font-size:13px;margin-bottom:14px"></div>
       <button type="submit" class="btn btn-gold btn-block">提交，去支付 ¥9.9</button>
-      <div class="hint" style="text-align:center;margin-top:10px">提交即创建订单 · 支付成功后立即生成报告 · 已购报告以快照保存，随时回看</div>
+      <div class="hint" style="text-align:center;margin-top:10px">提交即创建订单 · 支付成功后自动生成报告 · 已购报告以快照保存，随时回看</div>
     </form>
   </div>
 
@@ -119,14 +119,14 @@
     <div class="card" style="margin-bottom:16px">
       <h3 style="font-size:16px;margin-bottom:12px"><span class="seal">示</span>什么样的户型图可以用</h3>
       <ul class="vs-list">
-        <li>售楼书 / 中介平台的标准户型图最佳</li>
+        <li>优先使用售楼书 / 中介平台的标准户型图</li>
         <li>手绘草图也可以，标清入户门和房间即可</li>
-        <li>图上有指北针或南北标注最佳；方向不明时请在备注说明，方向未知时报告不输出确定房间吉凶，由风水师人工复核</li>
+        <li>图上有指北针或南北标注的，识别更准；方向不明时请在备注说明，方向未知时报告不输出确定房间吉凶，由风水师人工复核</li>
       </ul>
     </div>
     <div class="card">
       <h3 style="font-size:16px;margin-bottom:12px"><span class="seal">密</span>隐私说明</h3>
-      <p style="font-size:13px;color:var(--sub)">户型图仅用于 AI 识别（加密传输，服务器不保存原图）；识别结果与填写信息用于生成报告和订单记录，可随时在订单中删除。</p>
+      <p style="font-size:13px;color:var(--sub)">户型图经加密传输至第三方视觉识别服务（阿里云百炼）进行房间与门位识别，我方服务器不保存原图，原图仅缓存在你的浏览器本地；识别结果与填写信息用于生成报告和订单记录，可随时在订单中删除。数据存储于中国香港服务器，详见<a href="privacy.html">《隐私政策》</a>。</p>
     </div>
   </div>
 </div>
@@ -141,13 +141,13 @@
         <a href="product.html">户型分析报告</a>
         <a href="interpret.html">一对一解读</a>
         <a href="onsite.html">上门勘宅</a>
-        <a href="commercial.html">商业空间顾问</a>
+        <a href="goods.html">文创器物</a>
       </div>
       <div class="foot-col">
         <h4>了解运乘</h4>
         <a href="about.html">关于我们</a>
         <a href="about.html#team">风水师团队</a>
-        <a href="cases.html">服务案例</a>
+        <a href="cases.html">服务场景</a>
       </div>
       <div class="foot-col">
         <h4>使用</h4>
@@ -158,7 +158,7 @@
       </div>
       <div class="foot-col foot-follow">
         <h4>关注运乘</h4>
-        <p>关注微信服务号，报告与活动通知第一时间送达；扫码加入企业微信研学群，与风水师直接交流。</p>
+        <p>关注微信服务号，报告与活动通知及时送达；扫码加入企业微信研学群，与风水师直接交流。</p>
         <div class="qr-row">
           <figure class="qr-item">
             <img src="assets/img/qr-service.png" alt="运乘文创微信服务号二维码" width="104" height="104" loading="lazy" decoding="async">
@@ -171,8 +171,9 @@
         </div>
       </div>
     </div>
-    <p>本站内容源自传统居住文化文献与师承经验整理，属于文化参考信息，不构成购房、居住或投资决策建议。</p>
-    <p style="opacity:.6;margin-top:8px">© 2026 运乘文创 · 内测期间功能陆续开放</p>
+    <p>本站内容源自传统居住文化文献与师承经验整理，属于文化参考信息，不构成购房、居住、装修或投资决策建议，也不构成健康、医疗、婚姻、生育方面的判断或预测。相关决策请结合实际情况并咨询对应领域的专业人士。</p>
+    <p class="foot-legal"><a href="terms.html">用户协议</a> · <a href="privacy.html">隐私政策</a></p>
+    <p style="opacity:.6;margin-top:8px">Copyright © 2026 运乘文创 · 内测期间功能陆续开放</p>
   </div>
 </footer>
 

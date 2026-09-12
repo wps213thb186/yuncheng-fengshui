@@ -290,7 +290,7 @@ function getOrderReport(id){
 }
 function yiji(base){
   return (base === "大吉" || base.indexOf("中吉") === 0)
-    ? "吉位宜动宜通：宜高大明亮、宜开门窗、可作卧室或常活动区（八星吉凶总要：临宫得位福禄增）"
+    ? "吉位宜动宜通：宜高大明亮、宜开门窗、可作卧室或常活动区（据八星吉凶总要「临宫得位」演绎）"
     : "凶位宜静宜闭：宜整洁少动、可作卫浴储物；储物须留泄口，勿封死成窝";
 }
 function localReport(door, birthYear, gender){
@@ -357,7 +357,7 @@ function openLoginModal(onOk){
         : '<div class="qr"><canvas id="ycQR" width="200" height="200"></canvas></div>'+
           '<div class="m-sub" style="margin-bottom:4px">请使用微信扫码授权登录</div>'+
           '<div style="margin-top:10px"><button class="btn btn-wechat" id="ycDoLogin" disabled>模拟：我已在微信中确认</button></div>')+
-      '<label class="agree"><input type="checkbox" id="ycAgree"><span>我已阅读并同意《用户协议》与《隐私政策》，授权获取微信昵称与手机号用于订单服务</span></label>'+
+      '<label class="agree"><input type="checkbox" id="ycAgree"><span>我已阅读并同意<a href="terms.html" target="_blank" rel="noopener">《用户协议》</a>与<a href="privacy.html" target="_blank" rel="noopener">《隐私政策》</a>，同意获取微信昵称用于账号识别与订单服务，并知悉数据存储于中国香港服务器</span></label>'+
       '<div class="hint" id="ycLoginErr" style="color:var(--bad)"></div>'+
     '</div>';
   document.body.appendChild(mask);
