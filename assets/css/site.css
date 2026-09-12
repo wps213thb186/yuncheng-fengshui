@@ -482,3 +482,21 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .nav a.btn-gold,.nav a.btn-gold:hover{color:#201808}
 .nav a.btn-ghost,.nav a.btn-ghost:hover{color:var(--ink)}
 .nav a.btn-wechat,.nav a.btn-wechat:hover{color:#fff}
+
+.foot-legal{margin-top:6px}
+.foot-legal a{color:var(--gold2);text-decoration:none}
+.foot-legal a:hover{text-decoration:underline}
+.price-sub{font-size:13px;color:var(--sub)}
+
+/* ===== 法务文档页（用户协议 / 隐私政策） ===== */
+.doc{max-width:760px}
+.doc-lead{color:var(--sub);font-size:14.5px;line-height:1.95;padding:16px 18px;border:1px solid var(--line-soft);border-radius:12px;margin-bottom:30px}
+.doc h2{font-size:17px;margin:34px 0 12px;color:var(--gold2);letter-spacing:.02em}
+.doc h2:first-child{margin-top:0}
+.doc p{font-size:14px;line-height:1.95;color:var(--sub);margin-bottom:12px}
+.doc p b,.doc li b{color:var(--ink);font-weight:600}
+.doc a{color:var(--gold2)}
+.doc-list{list-style:none;padding:0;margin:0 0 12px}
+.doc-list li{position:relative;padding-left:18px;font-size:14px;line-height:1.95;color:var(--sub);margin-bottom:8px}
+.doc-list li::before{content:"·";position:absolute;left:5px;color:var(--gold2)}
+.doc .hint{font-size:13px}
