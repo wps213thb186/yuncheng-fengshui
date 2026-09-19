@@ -185,7 +185,12 @@ YC.devBootstrap();
 YC.renderNav();
 /* 会话体检：本地仍显示已登录但 token 已失效（如服务端重置/重新部署）时自动清理，避免提交时静默失败 */
 if(YC.user() && YC.remote()){ YC.authMe().catch(function(){ YC.logout(); YC.renderNav(); }); }
-if(!YC.user()){ YC.requireAuth(function(){}); }
+/* 进入即要求登录（户型识别接口需登录）；关闭登录框 = 放弃上传，退回来源页（站外/直接打开则回产品页） */
+if(!YC.user()){ YC.requireAuth(function(){}, function(){
+  var fromSite = false;
+  try{ fromSite = !!document.referrer && new URL(document.referrer).origin === location.origin; }catch(e){}
+  if(fromSite && history.length > 1) history.back(); else location.replace("product.html");
+}); }
 
 /* 宫位选择：上北下南布局 */
 var GONGS=[["乾","西北"],["坎","正北"],["艮","东北"],["兑","正西"],null,["震","正东"],["坤","西南"],["离","正南"],["巽","东南"]];

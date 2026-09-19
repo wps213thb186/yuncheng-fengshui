@@ -342,7 +342,7 @@ function ensureQRLib(cb){
 function authAuthorize(state){
   return api("/api/auth/wechat/authorize" + (state ? "?state=" + encodeURIComponent(state) : ""));
 }
-function openLoginModal(onOk){
+function openLoginModal(onOk, onCancel){
   if(typeof document === "undefined") return;
   closeLoginModal();
   var mobile = isMobile();
@@ -351,12 +351,13 @@ function openLoginModal(onOk){
     '<div class="modal">'+
       '<button class="m-close" id="ycLoginClose">×</button>'+
       '<h3>微信一键登录</h3>'+
-      '<div class="m-sub">登录后可上传户型图、保存订单与报告<span class="mock-tag">内测模拟</span></div>'+
+      '<div class="m-sub">登录后可上传户型图、保存订单与报告</div>'+
       (mobile
         ? '<div style="padding:18px 0 4px"><button class="btn btn-wechat btn-block" id="ycDoLogin" disabled>微信一键登录</button></div>'
         : '<div class="qr"><canvas id="ycQR" width="200" height="200"></canvas></div>'+
-          '<div class="m-sub" style="margin-bottom:4px">请使用微信扫码授权登录</div>'+
-          '<div style="margin-top:10px"><button class="btn btn-wechat" id="ycDoLogin" disabled>模拟：我已在微信中确认</button></div>')+
+          '<div class="m-sub" id="ycQRTip" style="margin-bottom:4px">二维码加载中…</div>'+
+          // 模拟确认按钮默认隐藏，服务端确认是 mock 模式后才显示（避免真实模式冷启动时闪现）
+          '<div style="margin-top:10px"><button class="btn btn-wechat" id="ycDoLogin" style="display:none" disabled>模拟：我已在微信中确认</button></div>')+
       '<label class="agree"><input type="checkbox" id="ycAgree"><span>我已阅读并同意<a href="terms.html" target="_blank" rel="noopener">《用户协议》</a>与<a href="privacy.html" target="_blank" rel="noopener">《隐私政策》</a>，同意获取微信昵称用于账号识别与订单服务，并知悉数据存储于中国香港服务器</span></label>'+
       '<div class="hint" id="ycLoginErr" style="color:var(--bad)"></div>'+
     '</div>';
@@ -364,12 +365,19 @@ function openLoginModal(onOk){
   var btn = document.getElementById("ycDoLogin"), chk = document.getElementById("ycAgree");
   var err = document.getElementById("ycLoginErr");
   chk.onchange = function(){ btn.disabled = !chk.checked; };
-  document.getElementById("ycLoginClose").onclick = closeLoginModal;
-  mask.onclick = function(e){ if(e.target === mask) closeLoginModal(); };
+  function cancel(){ closeLoginModal(); if(onCancel) onCancel(); }
+  document.getElementById("ycLoginClose").onclick = cancel;
+  mask.onclick = function(e){ if(e.target === mask) cancel(); };
   var timer = null;
   function done(){ if(timer) clearInterval(timer); closeLoginModal(); renderNav(); if(onOk) onOk(user()); }
+  function showMockTag(){
+    var sub = mask.querySelector(".m-sub");
+    if(sub && !sub.querySelector(".mock-tag")) sub.insertAdjacentHTML("beforeend", '<span class="mock-tag">内测模拟</span>');
+  }
 
   if(mobile){
+    if(!remote()) showMockTag();
+    else serverHealth().then(function(h){ if(h && h.mock_mode !== false) showMockTag(); }).catch(function(){});
     btn.onclick = function(){
       btn.disabled = true; btn.textContent = "登录中…";
       if(!remote()){ loginWechatMock().then(done); return; }
@@ -385,14 +393,16 @@ function openLoginModal(onOk){
     loginQRStart().then(function(q){
       var c = document.getElementById("ycQR");
       var realQR = q.qr_url && q.qr_url.indexOf("http") === 0; // 真实授权链接 → 真二维码
+      var tip = document.getElementById("ycQRTip");
       if(c){
         if(realQR){
           ensureQRLib(function(ok){ if(ok) drawQR(c, q.qr_url); else pseudoQR(c, q.qr_url); });
-          btn.style.display = "none"; // 真实模式无模拟确认
-          var sub = mask.querySelector(".m-sub");
-          if(sub) sub.textContent = "请使用微信扫码，并在手机上确认授权";
-        }else{
+          if(tip) tip.textContent = "请使用微信扫码，并在手机上确认授权";
+        }else{ // mock / 纯本地：示意码 + 模拟确认按钮
           pseudoQR(c, q.qr_url || String(Date.now()));
+          if(tip) tip.textContent = "请使用微信扫码授权登录";
+          btn.style.display = "";
+          showMockTag();
         }
       }
       if(q.ticket){
@@ -409,13 +419,16 @@ function openLoginModal(onOk){
           loginWechatMock().then(done);
         };
       }
-    }).catch(function(e){ err.textContent = "无法连接服务：" + e.message; });
+    }).catch(function(e){
+      var tip = document.getElementById("ycQRTip"); if(tip) tip.textContent = "二维码加载失败，请关闭后重试";
+      err.textContent = "无法连接服务：" + e.message;
+    });
   }
 }
 function closeLoginModal(){ var m = document.getElementById("ycLoginMask"); if(m) m.remove(); }
-function requireAuth(onOk){
+function requireAuth(onOk, onCancel){
   if(user()){ if(onOk) onOk(user()); return true; }
-  openLoginModal(onOk); return false;
+  openLoginModal(onOk, onCancel); return false;
 }
 
 /* ---------- 顶栏登录态 ---------- */
