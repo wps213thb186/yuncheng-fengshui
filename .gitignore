@@ -1,8 +1,7 @@
 Claude outputs/
 .DS_Store
 
-# 第三方验证文件
-MP_verify_*.txt
+# 微信网页授权域名校验文件应随站点根目录版本化；原文件需从运维处取得。
 
 # SSL配置文件
 .well-known/

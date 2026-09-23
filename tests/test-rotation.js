@@ -6,7 +6,9 @@ require("../assets/js/store.js");
 const YC = globalThis.YC;
 
 let failed = 0;
+let checked = 0;
 function eq(actual, expect, msg){
+  checked++;
   const a = JSON.stringify(actual), e = JSON.stringify(expect);
   if(a === e){ console.log("PASS " + msg); }
   else { failed++; console.log("FAIL " + msg + "  expect=" + e + " actual=" + a); }
@@ -51,5 +53,5 @@ eq(YC.roomGongNorth([450,100,550,200], [100,100,900,900], "ne"), null, "ne æš‚ä¸
 eq(YC.northDirValid("n"), true, "northDirValid n");
 eq(YC.northDirValid("unknown"), false, "northDirValid unknown");
 
-console.log(failed ? ("FAILED: " + failed) : "ALL PASS (44)");
+console.log(failed ? ("FAILED: " + failed + "/" + checked) : ("ALL PASS (" + checked + ")"));
 process.exit(failed ? 1 : 0);
