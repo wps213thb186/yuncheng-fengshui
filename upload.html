@@ -7,6 +7,39 @@
 <meta name="description" content="上传户型图并补充入户门方位等基本信息，获取八宅户型居住环境分析报告。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23241d10'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23e6c886' font-family='serif'>运</text></svg>">
 <link rel="stylesheet" href="assets/css/site.css">
+<style>
+/* 门位引导 + 图上罗盘（第三期 3a） */
+.door-guide{margin:0 0 12px;border:1px solid var(--line-soft);border-radius:12px;background:#0f131b;font-size:13px;color:var(--sub)}
+.door-guide summary{cursor:pointer;padding:10px 14px;color:var(--gold2);list-style:none;user-select:none}
+.door-guide summary::-webkit-details-marker{display:none}
+.door-guide summary::before{content:"\25B8";margin-right:7px;font-size:11px}
+.door-guide[open] summary::before{content:"\25BE"}
+.door-guide .dg-body{padding:2px 16px 12px}
+.door-guide ol{margin:0;padding-left:18px}
+.door-guide li{margin:7px 0;line-height:1.7}
+.door-guide p{margin:8px 0 0;font-size:12.5px}
+.door-guide b{color:var(--ink);font-weight:600}
+.pv-wrap{position:relative;display:inline-block;max-width:100%;margin-top:14px}
+.pv-wrap img{display:block;max-width:100%;max-height:340px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#cpsOv{position:absolute;left:50%;top:50%;pointer-events:none;z-index:5}
+.cps-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:100%;height:100%;border:1.5px solid rgba(230,200,134,.8);border-radius:12px;background:rgba(10,13,18,.34);box-shadow:0 8px 30px rgba(0,0,0,.45)}
+.cps-cell{pointer-events:auto;display:flex;align-items:center;justify-content:center;cursor:pointer;border:.5px solid rgba(230,200,134,.3);transition:background .15s}
+.cps-cell:hover{background:rgba(201,163,92,.24)}
+.cps-cell.sel{background:rgba(201,163,92,.42)}
+.cps-cell.ai{box-shadow:inset 0 0 0 2px rgba(230,200,134,.9)}
+.cps-cell.center{pointer-events:none}
+.cps-cell.center span{color:rgba(236,230,214,.6);font-size:12px}
+.cps-cell span{display:block;text-align:center;line-height:1.35;font-size:11px;color:var(--gold2);text-shadow:0 1px 5px rgba(0,0,0,.85)}
+.cps-cell span b{display:block;font-family:var(--serif);font-size:19px;font-weight:600}
+.cps-bar{margin-top:10px;border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;background:#0f131b;font-size:12.5px;color:var(--sub)}
+.cps-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+.cps-row input[type=range]{flex:1;min-width:130px;accent-color:var(--gold)}
+.cps-row b{color:var(--gold2);min-width:44px;text-align:right}
+.cps-qb{padding:3px 11px;border:1px solid var(--line);border-radius:99px;background:transparent;color:var(--sub);cursor:pointer;font-size:12px}
+.cps-qb:hover{border-color:var(--gold);color:var(--gold2)}
+.cps-qb.on{border-color:var(--gold);color:var(--gold2);background:rgba(201,163,92,.14)}
+.cps-tip{line-height:1.7}
+</style>
 </head>
 <body>
 
@@ -61,14 +94,47 @@
           <div class="big">⌂</div>
           点击选择户型图图片（JPG/PNG）<br>
           <span style="font-size:12px;opacity:.75">图片将传输至第三方视觉识别服务用于房间与门位识别；我方服务器不保存原图，原图仅缓存在本机浏览器</span>
-          <img id="preview" style="display:none" alt="户型图预览">
         </div>
         <input type="file" id="file" accept="image/*" style="display:none">
+        <div class="pv-wrap" id="pvWrap" style="display:none">
+          <img id="preview" alt="户型图预览">
+          <div id="cpsOv" style="display:none" aria-hidden="true"></div>
+        </div>
+        <div id="cpsBtnRow" style="display:none;margin-top:10px">
+          <button type="button" class="btn btn-ghost" id="cpsToggle" style="font-size:13px;padding:8px 16px">🧭 图上罗盘：在户型图上叠加九宫盘，对齐方向后直接点选门位</button>
+        </div>
+        <div class="cps-bar" id="cpsBar" style="display:none">
+          <div class="cps-row">
+            <span>旋转罗盘</span>
+            <input type="range" id="cpsSlider" min="0" max="359" step="1" value="0" aria-label="旋转罗盘角度">
+            <b id="cpsDeg">0°</b>
+          </div>
+          <div class="cps-row">
+            <span>图的上方朝：</span>
+            <button type="button" class="cps-qb" data-d="0">北</button>
+            <button type="button" class="cps-qb" data-d="270">东</button>
+            <button type="button" class="cps-qb" data-d="180">南</button>
+            <button type="button" class="cps-qb" data-d="90">西</button>
+            <button type="button" class="cps-qb" id="cpsReset">复位</button>
+          </div>
+          <div class="cps-tip">把罗盘的「坎 · 正北」一格转到图上指北针所指的方向（图无方向标注就保持 0°，按上北下南），然后点击入户门所在的宫；点选结果自动同步到下方八宫格，以你的点击为最终确认。</div>
+        </div>
         <div id="ocrBox" style="display:none;margin-top:10px;font-size:12.5px"></div>
       </div>
 
       <div class="field">
         <label class="req"><b>入户门方位</b>（图有指北针时按指北针换算；无标注按上北下南；拿不准在备注说明）</label>
+        <details class="door-guide">
+          <summary>怎么确定门位？三种情况对号入座</summary>
+          <div class="dg-body">
+            <ol>
+              <li><b>图上有指北针 / 方向标注</b>：上传图片后点「图上罗盘」，把罗盘的北对齐指北针方向，再点击入户门所在的宫。</li>
+              <li><b>图上没有方向标注</b>：按「上北下南」估算，直接在下面八宫格点选；方向拿不准时报告不输出确定房间吉凶，由风水师人工复核。</li>
+              <li><b>没有户型图</b>：站在屋内大致中心，打开手机指南针，面朝入户门读方位——正北选「坎」、东北选「艮」、正东选「震」、东南选「巽」、正南选「离」、西南选「坤」、正西选「兑」、西北选「乾」。</li>
+            </ol>
+            <p>拿不准就先选最接近的，并在备注里说明，解读报告时风水师会复核门位。</p>
+          </div>
+        </details>
         <div class="gong-grid" id="gongGrid"></div>
         <div class="hint" id="doorHint">八宅以门为伏位起大游年，门的位置是全部判定的起点，请务必按户型图方向选择。拿不准可在备注说明，报告解读时由风水师复核。</div>
       </div>
@@ -197,6 +263,7 @@ function pickDoor(g, silent){
   selDoor=g;
   grid.querySelectorAll(".gong-cell").forEach(function(c){c.classList.remove("sel");c.classList.remove("ai");});
   cells[g].classList.add("sel");
+  cpsMark(g,"sel"); // 同步高亮图上罗盘对应宫
   var dh=document.getElementById("doorHint");
   if(dh) dh.textContent="已确认门位："+cells[g].textContent.trim()+"。八宅以门为伏位起大游年，门位是全部判定的起点。";
 }
@@ -205,6 +272,7 @@ function aiPickDoor(g){
   if(!cells[g] || selDoor) return;
   grid.querySelectorAll(".gong-cell").forEach(function(c){c.classList.remove("ai");});
   cells[g].classList.add("ai");
+  cpsMark(g,"ai"); // AI 初判同步到罗盘，仍为虚线预选
   var dh=document.getElementById("doorHint");
   if(dh) dh.innerHTML='AI 初判门位为 <b style="color:var(--gold2)">'+cells[g].textContent.trim()+'</b>（虚线框），请点击该宫确认；不准请改选其他方位。';
 }
@@ -218,6 +286,76 @@ GONGS.forEach(function(g){
   }
   grid.appendChild(d);
 });
+
+/* ---------- 图上罗盘：在户型图上叠加可旋转九宫盘，对齐方向后直接点选门位 ---------- */
+/* 宫位固定绑定真实方位（坎=正北），整盘旋转对齐指北针；点选与下方八宫格双向同步，最终以用户点击为准 */
+var pvWrap=document.getElementById("pvWrap");
+var cpsBtnRow=document.getElementById("cpsBtnRow");
+var cpsBar=document.getElementById("cpsBar");
+var cpsOvEl=document.getElementById("cpsOv");
+var cpsToggle=document.getElementById("cpsToggle");
+var cpsSlider=document.getElementById("cpsSlider");
+var cpsDegEl=document.getElementById("cpsDeg");
+var cpsCells={}, cpsBuilt=false, cpsOpen=false, cpsDeg=0;
+/* OCR north_dir=图上方朝向；图上方朝东时真北在图左侧，盘需逆时针转 90°（CSS 角度 270） */
+var CPS_NORTH_PRESET={n:0,e:270,s:180,w:90};
+function cpsBuild(){
+  if(cpsBuilt) return; cpsBuilt=true;
+  var g=document.createElement("div"); g.className="cps-grid";
+  GONGS.forEach(function(gn){
+    var c=document.createElement("div");
+    if(!gn){ c.className="cps-cell center"; c.innerHTML="<span>宅心</span>"; }
+    else{
+      c.className="cps-cell";
+      c.innerHTML="<span><b>"+gn[0]+"</b>"+gn[1]+"</span>";
+      cpsCells[gn[0]]=c;
+      (function(g0){ c.onclick=function(){ pickDoor(g0); }; })(gn[0]);
+    }
+    g.appendChild(c);
+  });
+  cpsOvEl.appendChild(g);
+}
+function cpsSize(){
+  var w=preview.clientWidth, h=preview.clientHeight;
+  if(!w || !h) return;
+  var s=Math.max(w,h); // 边长取宽高大者，保证外圈宫位覆盖全图
+  cpsOvEl.style.width=s+"px"; cpsOvEl.style.height=s+"px";
+  pvWrap.style.padding=((s-h)/2)+"px 0"; // 盘高出图的部分用对称内边距让位，避免遮住相邻控件
+}
+function cpsSetDeg(d){
+  cpsDeg=((Math.round(d)%360)+360)%360;
+  cpsOvEl.style.transform="translate(-50%,-50%) rotate("+cpsDeg+"deg)";
+  cpsOvEl.querySelectorAll(".cps-cell span").forEach(function(sp){ sp.style.transform="rotate("+(-cpsDeg)+"deg)"; }); // 文字反向旋转保持正立
+  cpsSlider.value=cpsDeg;
+  cpsDegEl.textContent=cpsDeg+"°";
+  document.querySelectorAll(".cps-qb[data-d]").forEach(function(b){
+    b.classList.toggle("on", parseInt(b.getAttribute("data-d"),10)===cpsDeg);
+  });
+}
+function cpsShow(open){
+  cpsOpen=open;
+  if(open){
+    cpsBuild(); cpsSize(); cpsSetDeg(cpsDeg);
+    cpsOvEl.style.display="block"; cpsBar.style.display="block";
+    cpsToggle.textContent="🧭 收起图上罗盘";
+    if(selDoor) cpsMark(selDoor,"sel");
+  }else{
+    cpsOvEl.style.display="none"; cpsBar.style.display="none";
+    cpsToggle.textContent="🧭 图上罗盘：在户型图上叠加九宫盘，对齐方向后直接点选门位";
+  }
+}
+function cpsMark(g, cls){
+  if(!cpsBuilt) return;
+  cpsOvEl.querySelectorAll(".cps-cell").forEach(function(c){c.classList.remove("sel");c.classList.remove("ai");});
+  if(g && cpsCells[g]) cpsCells[g].classList.add(cls);
+}
+cpsToggle.onclick=function(){ cpsShow(!cpsOpen); };
+cpsSlider.oninput=function(){ cpsSetDeg(parseInt(this.value,10)||0); };
+document.getElementById("cpsReset").onclick=function(){ cpsSetDeg(0); };
+document.querySelectorAll(".cps-qb[data-d]").forEach(function(b){
+  b.onclick=function(){ cpsSetDeg(parseInt(b.getAttribute("data-d"),10)); };
+});
+window.addEventListener("resize", function(){ if(cpsOpen) cpsSize(); });
 
 /* 图片：本地预览 + 压缩（localStorage 容量保护）；远程模式下自动跑 AI 识别 */
 var imgData=null, ocrResult=null;
@@ -243,11 +381,17 @@ function runOcr(){
       northMsg = d.north_dir === "n"
         ? ' · 方向已识别：图上方即正北'
         : ' · 方向已识别：图上方朝'+YC.NORTH_DIR_NAME[d.north_dir]+'，房间落宫将按指北方向校准';
+      northMsg += '；图上罗盘已按此预对齐，请核对';
     }else{
       northMsg = ' · 图中未识别到方向标记，房间落宫按方向未知处理（报告不输出确定房间吉凶，可由风水师复核）';
     }
     ocrBox.innerHTML='<div style="color:var(--good)">✓ 识别到 '+d.rooms.length+' 个空间'+doorMsg+northMsg+'</div><div style="margin-top:6px">'+chips+'</div>';
     if(g) aiPickDoor(g);
+    /* 识别到方向标注时：罗盘自动预对齐并打开，便于用户核对后点选门位 */
+    if(d.north_dir && YC.northDirValid && YC.northDirValid(d.north_dir) && CPS_NORTH_PRESET[d.north_dir]!=null){
+      cpsSetDeg(CPS_NORTH_PRESET[d.north_dir]);
+      if(!cpsOpen) cpsShow(true);
+    }
   }).catch(function(){
     ocrBox.style.display="none"; // 识别失败不阻塞流程
   });
@@ -265,13 +409,36 @@ file.onchange=function(){
       var cv=document.createElement("canvas"); cv.width=w; cv.height=h;
       cv.getContext("2d").drawImage(im,0,0,w,h);
       imgData=cv.toDataURL("image/jpeg",0.72);
-      preview.src=imgData; preview.style.display="block";
+      preview.onload=function(){ if(cpsOpen) cpsSize(); };
+      preview.src=imgData;
+      pvWrap.style.display="inline-block";
+      cpsBtnRow.style.display="block";
       runOcr();
     };
     im.src=rd.result;
   };
   rd.readAsDataURL(f);
 };
+
+/* dev 演示：?dev=1&demoimg=1 生成占位户型图并自动打开罗盘（图上指北针朝右，预转 90°），仅本地调试用 */
+if(location.search.indexOf("dev=1")>=0 && location.search.indexOf("demoimg=1")>=0){
+  var dcv=document.createElement("canvas"); dcv.width=640; dcv.height=480;
+  var dx=dcv.getContext("2d");
+  dx.fillStyle="#f4f0e6"; dx.fillRect(0,0,640,480);
+  dx.strokeStyle="#3a3a3a"; dx.lineWidth=4; dx.strokeRect(40,40,560,400);
+  dx.lineWidth=2;
+  dx.beginPath(); dx.moveTo(330,40); dx.lineTo(330,230); dx.lineTo(600,230); dx.moveTo(40,300); dx.lineTo(400,300); dx.lineTo(400,440); dx.stroke();
+  dx.fillStyle="#3a3a3a"; dx.font="18px sans-serif";
+  dx.fillText("客 厅",160,180); dx.fillText("主 卧",455,140); dx.fillText("次 卧",460,340); dx.fillText("厨 房",120,380); dx.fillText("卫生间",300,380);
+  dx.strokeStyle="#b03a2e"; dx.lineWidth=6; dx.beginPath(); dx.moveTo(250,440); dx.lineTo(350,440); dx.stroke();
+  dx.fillStyle="#b03a2e"; dx.font="16px sans-serif"; dx.fillText("入户门",272,432);
+  dx.fillStyle="#1d4e89"; dx.font="bold 15px sans-serif"; dx.fillText("北 →",516,70);
+  imgData=dcv.toDataURL("image/jpeg",0.85);
+  preview.onload=function(){ cpsShow(true); cpsSetDeg(90); };
+  preview.src=imgData;
+  pvWrap.style.display="inline-block";
+  cpsBtnRow.style.display="block";
+}
 
 var submitting=false;
 function doSubmit(){
