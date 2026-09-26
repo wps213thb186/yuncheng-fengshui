@@ -7,6 +7,31 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23241d10'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23e6c886' font-family='serif'>运</text></svg>">
 <link rel="stylesheet" href="assets/css/site.css">
+<style>
+/* 第二期 · 报告白话分层组件样式（仅本页使用） */
+.plain-lead{font-size:13.5px;line-height:1.9;background:rgba(230,200,134,.07);border:1px solid rgba(230,200,134,.28);border-radius:10px;padding:12px 14px;margin:2px 0 12px}
+.plain-note{font-size:12px;color:var(--sub)}
+.spot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.spot{border:1px solid var(--line-soft);border-radius:12px;padding:14px 14px 12px;background:rgba(255,255,255,.02)}
+.spot .sp-tag{font-size:12px;color:var(--gold2);letter-spacing:.08em;margin-bottom:6px}
+.spot .sp-title{font-family:var(--serif);font-size:16.5px;margin-bottom:6px}
+.spot .sp-body{font-size:12.5px;color:var(--sub);line-height:1.8}
+@media (max-width:760px){.spot-grid{grid-template-columns:1fr}}
+details.plain-d{border:1px dashed var(--line-soft);border-radius:10px;padding:10px 14px}
+details.plain-d>summary{cursor:pointer;font-size:12.5px;color:var(--gold2);list-style:none}
+details.plain-d>summary::-webkit-details-marker{display:none}
+details.plain-d>summary::before{content:"\25B8  "}
+details.plain-d[open]>summary::before{content:"\25BE  "}
+details.plain-d .kv{margin-top:12px}
+.dict-group{font-size:12px;color:var(--gold2);letter-spacing:.12em;margin:18px 0 4px}
+.dict-item{border-bottom:1px dashed var(--line-soft);padding:10px 2px}
+.dict-item:last-child{border-bottom:none}
+.dict-item>summary{cursor:pointer;font-size:13.5px;list-style:none}
+.dict-item>summary::-webkit-details-marker{display:none}
+.dict-item>summary::before{content:"\25B8  ";color:var(--gold2)}
+.dict-item[open]>summary::before{content:"\25BE  "}
+.dict-item p{font-size:12.5px;color:var(--sub);line-height:1.9;margin:8px 0 2px}
+</style>
 </head>
 <body>
 
@@ -100,6 +125,7 @@
 
 <script src="assets/js/config.js"></script>
 <script src="assets/js/engine.js"></script>
+<script src="assets/js/plain.js"></script>
 <script src="assets/js/store.js"></script>
 <script src="assets/js/site.js"></script>
 <script>
@@ -148,6 +174,8 @@ function render(order, r){
     "订单 " + order.id + " · " + (p.name || "未命名房源") + " · 生成于 " + YC.fmtTime(order.paidAt || order.createdAt);
   var byGong = {};
   r.palaces.forEach(function(j){ byGong[j.gong] = j; });
+  /* 白话分层：呈现层解读文案（plain.js），缺失时自动退回纯术语版 */
+  var PLN = window.YC_PLAIN || null;
 
   /* ---- 宅况总览 ---- */
   var ov = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:14px"><span class="seal">宅</span>宅况总览</h3><dl class="kv">'+
@@ -180,6 +208,31 @@ function render(order, r){
   if(p.note) ov += '<dl class="kv" style="margin-top:10px"><dt>备注</dt><dd class="dim">'+esc(p.note)+'</dd></dl>';
   ov += '</div>';
 
+  /* ---- 白话分层：先看这三处（门 + 最佳吉宫 + 最需留意的凶宫） ---- */
+  var bestJi = null, worstXiong = null;
+  r.palaces.forEach(function(j){
+    if(!bestJi && j.base === "大吉") bestJi = j;
+    if(!worstXiong && j.base === "大凶") worstXiong = j;
+  });
+  var spots = "";
+  if(PLN){
+    spots = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">读</span>先看这三处</h3>'+
+      '<p style="font-size:12.5px;color:var(--sub);margin-bottom:14px;line-height:1.8">整份报告最关键的三个位置，各一句话；想看依据再往下翻。报告里的星名（生气、五鬼……）是这套传统规则的类别名称，说的是排盘结果，不是对房间的实测。</p>'+
+      '<div class="spot-grid">'+
+      '<div class="spot"><div class="sp-tag">起点 · 入户门</div>'+
+        '<div class="sp-title">'+r.door_dir+' · '+r.door+'宫</div>'+
+        '<div class="sp-body">整张盘从入户门起算（伏位）：门的方位定了，八宫吉凶的排布就定了。</div></div>'+
+      (bestJi ? '<div class="spot"><div class="sp-tag">最值得用好</div>'+
+        '<div class="sp-title">'+bestJi.dir+' · '+bestJi.gong+'宫 · '+bestJi.star+'</div>'+
+        '<div class="sp-body">「'+bestJi.star+'」'+esc(PLN.STAR_CLASS[bestJi.star]||"")+'。'+esc(PLN.BASE_PLAIN["大吉"])+'</div></div>' : '')+
+      (worstXiong ? '<div class="spot"><div class="sp-tag">最需要留意</div>'+
+        '<div class="sp-title">'+worstXiong.dir+' · '+worstXiong.gong+'宫 · '+worstXiong.star+'</div>'+
+        '<div class="sp-body">「'+worstXiong.star+'」'+esc(PLN.STAR_CLASS[worstXiong.star]||"")+'。'+esc(PLN.BASE_PLAIN["大凶"])+(worstXiong.gong===r.door ? "（恰好也是入户门所在宫）" : "")+'</div></div>' : '')+
+      '</div>'+
+      '<div class="hint" style="margin-top:12px">想知道这些位置具体怎么安排、怎么调整？页面底部可以约师傅一对一解读。</div>'+
+      '</div>';
+  }
+
   /* ---- 八宫星布（上北下南） ---- */
   var LAYOUT = ["乾","坎","艮","兑",null,"震","坤","离","巽"];
   var grid = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">宫</span>八宫星布</h3>'+
@@ -195,20 +248,27 @@ function render(order, r){
   });
   grid += '</div></div>';
 
-  /* ---- 逐宫判定（palaces 已按 大吉→中吉→次凶→大凶 排序） ---- */
-  var list = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:16px"><span class="seal">断</span>逐宫判定</h3>';
+  /* ---- 逐宫判定（palaces 已按 大吉→中吉→次凶→大凶 排序；白话顶置，术语明细折叠） ---- */
+  var list = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">断</span>逐宫判定</h3>'+
+    '<p style="font-size:12.5px;color:var(--sub);margin-bottom:16px">每宫先看一句白话；术语与文献明细收在「专业明细」里，点开查看。</p>';
   r.palaces.forEach(function(j){
+    var plainLine = "";
+    if(PLN && PLN.STAR_CLASS[j.star]){
+      plainLine = '这一宫排到「'+j.star+'」（'+PLN.STAR_CLASS[j.star]+'），与宫位的五行关系是「'+j.rel+'」，综合评定「'+j.base+'」。'+(PLN.BASE_PLAIN[PLN.baseKey(j.base)]||'');
+    }
     list += '<div class="judge-card" style="border-bottom:1px dashed var(--line-soft);padding-bottom:16px">'+
       '<div class="judge-head"><span class="jh-gong">'+j.gong+'宫 · '+j.dir+'</span>'+
       '<span class="jh-star">'+j.star+' · '+j.star_ming+'</span>'+badgeBase(j.base)+
       (j.gong===r.door ? '<span class="badge b-gold">入户门 · 伏位</span>' : '')+srcBadge(j.level)+'</div>'+
+      (plainLine ? '<p class="plain-lead">'+esc(plainLine)+'</p>' : '')+
+      '<details class="plain-d"><summary>专业明细：星宫关系 · 应象 · 应期 · 宜忌</summary>'+
       '<dl class="kv">'+
-      '<dt>星宫关系</dt><dd>'+j.rel_desc+'（'+j.rel+'）</dd>'+
+      '<dt>星宫关系</dt><dd>'+j.rel_desc+'（'+j.rel+'）'+((PLN && PLN.REL_PLAIN[j.rel]) ? '<br><span class="plain-note">'+esc(PLN.REL_PLAIN[j.rel])+'</span>' : '')+'</dd>'+
       (j.note ? '<dt>注意</dt><dd style="color:var(--bad)">'+j.note+'</dd>' : '')+
       '<dt>应象</dt><dd class="dim">'+j.yingxiang+'</dd>'+
       '<dt>应期</dt><dd class="dim">'+j.yingqi+'</dd>'+
       '<dt>宜忌</dt><dd>'+j.yiji+'</dd>'+
-      '</dl></div>';
+      '</dl></details></div>';
   });
   list += '</div>';
 
@@ -233,9 +293,29 @@ function render(order, r){
     '<a class="btn btn-ghost" href="'+(window.YC_CS_URL||'#')+'" target="_blank" rel="noopener">预约上门勘宅</a>'+
     '</div></div>';
 
+  /* ---- 白话分层：术语小词典（页脚前，默认折叠） ---- */
+  var dict = "";
+  if(PLN){
+    dict = '<div class="card" style="margin-bottom:16px"><h3 style="font-size:16px;margin-bottom:6px"><span class="seal">典</span>看不懂的词，都在这里</h3>'+
+      '<p style="font-size:12.5px;color:var(--sub)">八星、星宫关系与常用术语的白话解释，点开任意一条查看。</p>';
+    dict += '<div class="dict-group">八星</div>';
+    Object.keys(PLN.STAR_PLAIN).forEach(function(s){
+      dict += '<details class="dict-item"><summary>'+s+'（'+esc(PLN.STAR_CLASS[s]||"")+'）</summary><p>'+esc(PLN.STAR_PLAIN[s])+'</p></details>';
+    });
+    dict += '<div class="dict-group">星宫关系</div>';
+    Object.keys(PLN.REL_PLAIN).forEach(function(k){
+      dict += '<details class="dict-item"><summary>'+k+'</summary><p>'+esc(PLN.REL_PLAIN[k])+'</p></details>';
+    });
+    dict += '<div class="dict-group">常用术语</div>';
+    PLN.TERMS.forEach(function(t){
+      dict += '<details class="dict-item"><summary>'+esc(t.term)+'</summary><p>'+esc(t.meaning)+'</p></details>';
+    });
+    dict += '</div>';
+  }
+
 
   var note = '<div class="foot-note">溯源：大游年歌（卷一p57-58）· 相宅宗旨（p1）· 星宫生克吉凶论（p85-87）· 八星吉凶总要（p63）· 九星年限应验歌（p88-90）；各宫「应象」为依原书规则推演的空间宜忌表述（标注为原书演绎），不构成对人身祸福、健康、生育或财运的预测。本报告为门位级八宅判定'+(hasOverlay?'，房间落宫由 AI 识别户型图并按指北方向校准叠加':'；上传户型图可自动叠加房间级落宫')+'；窝气/死气/背气诊断将在后续版本补入；已购报告以支付时快照为准，算法升级不改变本份报告内容。报告内容属传统居住文化参考信息，不构成购房、居住或投资决策建议。</div>';
-  main.innerHTML = ov + grid + list + tbl + cta + note;
+  main.innerHTML = ov + spots + grid + list + tbl + cta + dict + note;
   if(hasOverlay){
     var box = document.getElementById("planOverlay");
     if(box && !YC.renderOcrOverlay(box, p.img, p.ocr, byGong)){
