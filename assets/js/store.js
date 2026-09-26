@@ -309,7 +309,6 @@ function localReport(door, birthYear, gender){
   var r = { door: door, door_dir: E.DIRNAME[door], group: sum.group,
             counts: { ji: sum.ji, zhongji: sum.zhongji, daxiong: sum.daxiong },
             palaces: palaces, door_compare: compare,
-            huajie: E.HUAJIE, iron_rule: E.IRON, zongjue: E.ZONGJUE,
             engine_check: { total: chk.total, pass: chk.pass } };
   if(birthYear){
     var mg = E.mingGua(birthYear, gender || "男");
